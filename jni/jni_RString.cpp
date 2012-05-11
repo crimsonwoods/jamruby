@@ -1,0 +1,24 @@
+#include "jni_RString.h"
+extern "C" {
+#include "mruby.h"
+#include "mruby/string.h"
+}
+
+#include "safe_jni.hpp"
+
+inline static RString *to_ptr(jlong str) {
+	return reinterpret_cast<RString*>(static_cast<intptr_t>(str));
+}
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_RString
+ * Method:    n_getBuf
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RString_n_1getBuf
+  (JNIEnv *env, jclass clazz, jlong str)
+{
+	safe_jni::safe_local_ref<jstring> jstr(env, env->NewStringUTF(to_ptr(str)->buf));
+	return jstr.get();
+}
+
