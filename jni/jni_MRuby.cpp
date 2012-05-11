@@ -18,8 +18,26 @@ static inline void throw_exception(JNIEnv *env, char const *name, char const *me
 
 #define MRBSTATE(mrb) to_ptr<mrb_state>(mrb)
 
-template <typename T> inline T* to_ptr(jlong &handle) {
+template <typename T> static inline T* to_ptr(jlong &handle) {
 	return reinterpret_cast<T*>(static_cast<intptr_t>(handle));
+}
+
+static inline mrb_sym to_sym(jlong &sym) {
+	return static_cast<mrb_sym>(sym);
+}
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_strNew
+ * Signature: (JLjava/lang/String;)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1strNew
+  (JNIEnv *env, jclass clazz, jlong mrb, jstring str)
+{
+	safe_jni::safe_string jstr(env, str);
+	mrb_value const &value = mrb_str_new(MRBSTATE(mrb), jstr.string(), jstr.length());
+	safe_jni::safe_local_ref<jobject> val(env, create_value(env, value));
+	return val.get();
 }
 
 /*
@@ -229,6 +247,18 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 	fflush(0);
 	safe_jni::safe_local_ref<jobject> ref(env, create_value(env, ret));
 	return ref.get();
+}
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_sym2name
+ * Signature: (JJ)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1sym2name
+  (JNIEnv *env, jclass clazz, jlong mrb, jlong sym)
+{
+	safe_jni::safe_local_ref<jstring> jstr(env, env->NewStringUTF(mrb_sym2name(MRBSTATE(mrb), to_sym(sym))));
+	return jstr.get();
 }
 
 static inline int valueAsInt(JNIEnv *env, jclass cls, jobject value)

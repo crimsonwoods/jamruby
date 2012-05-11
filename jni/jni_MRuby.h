@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_strNew
+ * Signature: (JLjava/lang/String;)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1strNew
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
  * Method:    n_open
  * Signature: ()J
  */
@@ -102,6 +110,14 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
  */
 JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1p
   (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_sym2name
+ * Signature: (JJ)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1sym2name
+  (JNIEnv *, jclass, jlong, jlong);
 
 #ifdef __cplusplus
 }

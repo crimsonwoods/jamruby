@@ -54,7 +54,7 @@ public class MRuby {
 	}
 	
 	public Value strNew(State state, String str) {
-		return n_strNew(str);
+		return n_strNew(state.nativeObject(), str);
 	}
 	
 	public Value topSelf(State state) {
@@ -65,7 +65,11 @@ public class MRuby {
 		return n_p(state.nativeObject(), obj);
 	}
 	
-	private static native Value n_strNew(String str);
+	public String sym2name(State state, Symbol sym) {
+		return n_sym2name(state.nativeObject(), sym.nativeObject());
+	}
+	
+	private static native Value n_strNew(long mrb, String str);
 	private static native long n_open();
 	private static native int n_loadIrep(long mrb, String path) throws FileNotFoundException;
 	private static native long n_parseString(long mrb, String command);
@@ -78,6 +82,7 @@ public class MRuby {
 	private static native long n_procNew(long mrb, long irep);
 	private static native Value n_topSelf(long mrb);
 	private static native Value n_p(long mrb, Value obj);
+	private static native String n_sym2name(long mrb, long sym);
 	
 	static {
 		System.loadLibrary("jamruby");
