@@ -1,9 +1,9 @@
 LOCAL_PATH := $(call my-dir)
-RUBY_ROOT  := /path/to/mruby
+RUBY_ROOT  := $(LOCAL_PATH)/../../mruby
 
 $(shell mkdir -p $(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI))
-$(shell cp $(RUBY_ROOT)/android/obj/local/$(TARGET_ARCH_ABI)/libmruby_lib.a ../obj/local/$(TARGET_ARCH_ABI)/libmruby.a)
-$(shell cp $(RUBY_ROOT)/android/obj/local/$(TARGET_ARCH_ABI)/libmrblib.a ../obj/local/$(TARGET_ARCH_ABI)/libmrblib.a)
+$(shell cp $(RUBY_ROOT)/android/obj/local/$(TARGET_ARCH_ABI)/libmruby_lib.a $(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/libmruby.a)
+$(shell cp $(RUBY_ROOT)/android/obj/local/$(TARGET_ARCH_ABI)/libmrblib.a $(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/libmrblib.a)
 $(shell mkdir -p $(LOCAL_PATH)/mrblib)
 $(shell cp $(RUBY_ROOT)/mrblib/mrblib.c $(LOCAL_PATH)/mrblib/mrblib.c)
 
