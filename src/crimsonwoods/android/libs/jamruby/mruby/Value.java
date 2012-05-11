@@ -6,7 +6,7 @@ public class Value {
 	private ValueType type;
 	private int i;
 	private double f;
-	private long sym;
+	private Symbol sym;
 	private RBasic obj;
 	
 	public Value(int type, int value) {
@@ -26,7 +26,7 @@ public class Value {
 		this.type = type;
 		switch(type) {
 		case MRB_TT_SYMBOL:
-			this.sym = obj;
+			this.sym = new Symbol(obj);
 			break;
 		case MRB_TT_ARRAY:
 			this.obj = new RArray(obj);
@@ -89,7 +89,7 @@ public class Value {
 		return f;
 	}
 	
-	public long asSymbol() {
+	public Symbol asSymbol() {
 		return sym;
 	}
 	
@@ -129,6 +129,9 @@ public class Value {
 			builder.append(f);
 			break;
 		case MRB_TT_STRING:
+			builder.append(((RString)obj).toString());
+			break;
+		case MRB_TT_SYMBOL:
 		case MRB_TT_ARRAY:
 		case MRB_TT_CLASS:
 		case MRB_TT_DATA:
@@ -147,7 +150,6 @@ public class Value {
 		case MRB_TT_REGEX:
 		case MRB_TT_SCLASS:
 		case MRB_TT_STRUCT:
-		case MRB_TT_SYMBOL:
 		case MRB_TT_THREAD:
 		case MRB_TT_THREADGRP:
 			builder.append("Ruby-Object");
