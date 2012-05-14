@@ -14,23 +14,16 @@ import crimsonwoods.android.libs.jamruby.mruby.Value;
 
 public class Jamruby {
 	private State state;
-	private static Jamruby instance;
 	
 	public static final long UNAVAILABLE_NATIVE_OBJECT = 0;
 	
-	private Jamruby() {
+	public Jamruby() {
 		state = MRuby.getInstance().open();
-	}
-	
-	public static synchronized Jamruby getInstance() {
-		if (null == instance) {
-			instance = new Jamruby();
-		}
-		return instance;
 	}
 	
 	public void close() {
 		state.close();
+		state = null;
 	}
 	
 	@Override
@@ -42,16 +35,16 @@ public class Jamruby {
 		}
 	}
 	
-	public void run(String command, String...args) {
+	public Value run(String command, String...args) {
 		final MRuby mrb = MRuby.getInstance();
 		final int n = generateCode(mrb, mrb.parse(state, command));
-		run(mrb, n, args);
+		return run(mrb, n, args);
 	}
 	
-	public void run(File f, String...args) throws IOException {
+	public Value run(File f, String...args) throws IOException {
 		final MRuby mrb = MRuby.getInstance();
 		final int n = generateCode(mrb, mrb.parse(state, f));
-		run(mrb, n, args);
+		return run(mrb, n, args);
 	}
 	
 	private int generateCode(MRuby mrb, ParserState p) {
@@ -68,17 +61,18 @@ public class Jamruby {
 		return n;
 	}
 	
-	private void run(MRuby mrb, int n, String...args) {
+	private Value run(MRuby mrb, int n, String...args) {
 		final Value ARGV = mrb.arrayNew(state);
 		final int argc = args.length;
 		for(int i = 0; i < argc; ++i) {
 			mrb.arrayPush(state, ARGV, mrb.strNew(state, args[i]));
 		}
 		mrb.defineGlobalConst(state, "ARGV", ARGV);
-		mrb.run(state, mrb.procNew(state, state.irep()[n]), mrb.topSelf(state));
+		final Value ret = mrb.run(state, mrb.procNew(state, state.irep()[n]), mrb.topSelf(state));
 		final RObject exc = state.exc();
 		if (exc.available()) {
 			mrb.p(state, new Value(exc));
 		}
+		return ret;
 	}
 }
