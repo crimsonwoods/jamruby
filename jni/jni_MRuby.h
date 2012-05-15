@@ -119,6 +119,30 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1sym2name
   (JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_redirect_stdout
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stdout
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_redirect_stderr
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stderr
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_redirect_stdin
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stdin
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

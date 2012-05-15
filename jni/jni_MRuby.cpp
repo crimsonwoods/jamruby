@@ -260,6 +260,69 @@ JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 	return jstr.get();
 }
 
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_redirect_stdout
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stdout
+  (JNIEnv *env, jclass clazz)
+{
+	int stdout_pipe[2] = { -1, -1 };
+	if (0 > pipe(stdout_pipe)) {
+		throw_exception(env, "java/io/IOException", "Can not create pipe.");
+		return -1;
+	}
+	if (0 > dup2(stdout_pipe[1], STDOUT_FILENO)) {
+		throw_exception(env, "java/io/IOException", "Can not duplicate file descriptor.");
+		return -1;
+	}
+	(void)close(stdout_pipe[1]);
+	return stdout_pipe[0];
+}
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_redirect_stderr
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stderr
+  (JNIEnv *env, jclass clazz)
+{
+	int stderr_pipe[2] = { -1, -1 };
+	if (0 > pipe(stderr_pipe)) {
+		throw_exception(env, "java/io/IOException", "Can not create pipe.");
+		return -1;
+	}
+	if (0 > dup2(stderr_pipe[1], STDERR_FILENO)) {
+		throw_exception(env, "java/io/IOException", "Can not duplicate file descriptor.");
+		return -1;
+	}
+	(void)close(stderr_pipe[1]);
+	return stderr_pipe[0];
+}
+
+/*
+ * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Method:    n_redirect_stdin
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stdin
+  (JNIEnv *env, jclass clazz)
+{
+	int stdin_pipe[2] = { -1, -1 };
+	if (0 > pipe(stdin_pipe)) {
+		throw_exception(env, "java/io/IOException", "Can not create pipe.");
+		return -1;
+	}
+	if (0 > dup2(stdin_pipe[0], STDIN_FILENO)) {
+		throw_exception(env, "java/io/IOException", "Can not duplicate file descriptor.");
+		return -1;
+	}
+	(void)close(stdin_pipe[0]);
+	return stdin_pipe[1];
+}
+
 static inline void throw_exception(JNIEnv *env, char const *name, char const *message)
 {
 	safe_jni::safe_local_ref<jclass> clazz(env, env->FindClass(name));

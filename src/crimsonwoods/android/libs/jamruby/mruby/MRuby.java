@@ -1,7 +1,14 @@
 package crimsonwoods.android.libs.jamruby.mruby;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import crimsonwoods.android.libs.jamruby.io.FileDescriptorHelper;
 
 public class MRuby {
 	public static State open() {
@@ -60,6 +67,18 @@ public class MRuby {
 		return n_sym2name(state.nativeObject(), sym.nativeObject());
 	}
 	
+	public static InputStream stdout() throws IOException {
+		return new FileInputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stdout()));
+	}
+	
+	public static InputStream stderr() throws IOException {
+		return new FileInputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stderr()));
+	}
+	
+	public static OutputStream stdin() throws IOException {
+		return new FileOutputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stdin()));
+	}
+	
 	private static native Value n_strNew(long mrb, String str);
 	private static native long n_open();
 	private static native int n_loadIrep(long mrb, String path) throws FileNotFoundException;
@@ -74,6 +93,9 @@ public class MRuby {
 	private static native Value n_topSelf(long mrb);
 	private static native Value n_p(long mrb, Value obj);
 	private static native String n_sym2name(long mrb, long sym);
+	private static native int n_redirect_stdout() throws IOException;
+	private static native int n_redirect_stderr() throws IOException;
+	private static native int n_redirect_stdin() throws IOException;
 	
 	static {
 		System.loadLibrary("jamruby");
