@@ -67,17 +67,30 @@ public class MRuby {
 		return n_sym2name(state.nativeObject(), sym.nativeObject());
 	}
 	
-	public static InputStream stdout() throws IOException {
-		return new FileInputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stdout()));
+	public static synchronized InputStream stdout() throws IOException {
+		if (null == stdout) {
+			stdout = new FileInputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stdout()));
+		}
+		return stdout;
 	}
 	
-	public static InputStream stderr() throws IOException {
-		return new FileInputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stderr()));
+	public static synchronized InputStream stderr() throws IOException {
+		if (null == stderr) {
+			stderr = new FileInputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stderr()));
+		}
+		return stderr;
 	}
 	
-	public static OutputStream stdin() throws IOException {
-		return new FileOutputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stdin()));
+	public static synchronized OutputStream stdin() throws IOException {
+		if (null == stdin) {
+			stdin = new FileOutputStream(FileDescriptorHelper.newFileDescriptor(n_redirect_stdin()));
+		}
+		return stdin;
 	}
+	
+	private static FileInputStream stdout;
+	private static FileInputStream stderr;
+	private static FileOutputStream stdin;
 	
 	private static native Value n_strNew(long mrb, String str);
 	private static native long n_open();
