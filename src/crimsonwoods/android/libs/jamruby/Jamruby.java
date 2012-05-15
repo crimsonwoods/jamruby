@@ -18,12 +18,16 @@ public class Jamruby {
 	public static final long UNAVAILABLE_NATIVE_OBJECT = 0;
 	
 	public Jamruby() {
-		state = MRuby.getInstance().open();
+		state = MRuby.open();
 	}
 	
 	public void close() {
 		state.close();
 		state = null;
+	}
+	
+	public State state() {
+		return state;
 	}
 	
 	@Override
@@ -36,18 +40,16 @@ public class Jamruby {
 	}
 	
 	public Value run(String command, String...args) {
-		final MRuby mrb = MRuby.getInstance();
-		final int n = generateCode(mrb, mrb.parse(state, command));
-		return run(mrb, n, args);
+		final int n = generateCode(MRuby.parse(state, command));
+		return run(n, args);
 	}
 	
 	public Value run(File f, String...args) throws IOException {
-		final MRuby mrb = MRuby.getInstance();
-		final int n = generateCode(mrb, mrb.parse(state, f));
-		return run(mrb, n, args);
+		final int n = generateCode(MRuby.parse(state, f));
+		return run(n, args);
 	}
 	
-	private int generateCode(MRuby mrb, ParserState p) {
+	private int generateCode(ParserState p) {
 		if (null == p) {
 			throw new ParseException();
 		}
@@ -55,23 +57,23 @@ public class Jamruby {
 		if (!node.available() || 0 != p.nerr()) {
 			throw new ParseException();
 		}
-		final int n = mrb.generateCode(state, p.tree());
+		final int n = MRuby.generateCode(state, p.tree());
 		final Pool pool = p.pool();
 		pool.close();
 		return n;
 	}
 	
-	private Value run(MRuby mrb, int n, String...args) {
-		final Value ARGV = mrb.arrayNew(state);
+	private Value run(int n, String...args) {
+		final Value ARGV = MRuby.arrayNew(state);
 		final int argc = args.length;
 		for(int i = 0; i < argc; ++i) {
-			mrb.arrayPush(state, ARGV, mrb.strNew(state, args[i]));
+			MRuby.arrayPush(state, ARGV, MRuby.strNew(state, args[i]));
 		}
-		mrb.defineGlobalConst(state, "ARGV", ARGV);
-		final Value ret = mrb.run(state, mrb.procNew(state, state.irep()[n]), mrb.topSelf(state));
+		MRuby.defineGlobalConst(state, "ARGV", ARGV);
+		final Value ret = MRuby.run(state, MRuby.procNew(state, state.irep()[n]), MRuby.topSelf(state));
 		final RObject exc = state.exc();
 		if (exc.available()) {
-			mrb.p(state, new Value(exc));
+			MRuby.p(state, new Value(exc));
 		}
 		return ret;
 	}

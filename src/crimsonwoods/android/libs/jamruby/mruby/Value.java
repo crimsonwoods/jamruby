@@ -131,8 +131,19 @@ public class Value {
 		case MRB_TT_STRING:
 			builder.append(((RString)obj).toString());
 			break;
-		case MRB_TT_SYMBOL:
 		case MRB_TT_ARRAY:
+			final Value[] values = ((RArray)obj).toArray();
+			if (null != values) {
+				builder.append(String.format("<length=%d", values.length));
+				for (int i = 0; i < values.length; ++i) {
+					builder.append(String.format(", [%d]={%s}", i, values[i].toString()));
+				}
+				builder.append(">");
+			} else {
+				builder.append("null");
+			}
+			break;
+		case MRB_TT_SYMBOL:
 		case MRB_TT_CLASS:
 		case MRB_TT_DATA:
 		case MRB_TT_ENV:

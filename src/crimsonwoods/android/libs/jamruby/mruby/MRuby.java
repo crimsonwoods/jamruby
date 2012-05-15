@@ -4,68 +4,59 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class MRuby {
-	private static MRuby instance;
-	
-	public static synchronized MRuby getInstance() {
-		if (null == instance) {
-			instance = new MRuby();
-		}
-		return instance;
-	}
-	
-	public State open() {
+	public static State open() {
 		return new State(n_open());
 	}
 	
-	public int loadIrep(State state, File f) throws FileNotFoundException {
+	public static int loadIrep(State state, File f) throws FileNotFoundException {
 		return n_loadIrep(state.nativeObject(), f.getAbsolutePath());
 	}
 	
-	public ParserState parse(State state, String command) {
+	public static ParserState parse(State state, String command) {
 		return new ParserState(n_parseString(state.nativeObject(), command));
 	}
 	
-	public ParserState parse(State state, File f) throws FileNotFoundException {
+	public static ParserState parse(State state, File f) throws FileNotFoundException {
 		return new ParserState(n_parseFile(state.nativeObject(), f.getAbsolutePath()));
 	}
 	
-	public int generateCode(State state, AstNode node) {
+	public static int generateCode(State state, AstNode node) {
 		return n_generateCode(state.nativeObject(), node.nativeObject());
 	}
 	
-	public Value run(State state, RProc proc, Value value) {
+	public static Value run(State state, RProc proc, Value value) {
 		return n_run(state.nativeObject(), proc.nativeObject(), value);
 	}
 	
-	public void defineGlobalConst(State state, String name, Value value) {
+	public static void defineGlobalConst(State state, String name, Value value) {
 		n_defineGlobalConst(state.nativeObject(), name, value);
 	}
 	
-	public Value arrayNew(State state) {
+	public static Value arrayNew(State state) {
 		return n_arrayNew(state.nativeObject());
 	}
 	
-	public void arrayPush(State state, Value array, Value elem) {
+	public static void arrayPush(State state, Value array, Value elem) {
 		n_arrayPush(state.nativeObject(), array, elem);
 	}
 	
-	public RProc procNew(State state, Irep irep) {
+	public static RProc procNew(State state, Irep irep) {
 		return new RProc(n_procNew(state.nativeObject(), irep.nativeObject()));
 	}
 	
-	public Value strNew(State state, String str) {
+	public static Value strNew(State state, String str) {
 		return n_strNew(state.nativeObject(), str);
 	}
 	
-	public Value topSelf(State state) {
+	public static Value topSelf(State state) {
 		return n_topSelf(state.nativeObject());
 	}
 	
-	public Value p(State state, Value obj) {
+	public static Value p(State state, Value obj) {
 		return n_p(state.nativeObject(), obj);
 	}
 	
-	public String sym2name(State state, Symbol sym) {
+	public static String sym2name(State state, Symbol sym) {
 		return n_sym2name(state.nativeObject(), sym.nativeObject());
 	}
 	
