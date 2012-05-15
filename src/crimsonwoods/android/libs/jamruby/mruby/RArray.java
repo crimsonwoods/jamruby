@@ -13,11 +13,11 @@ public class RArray extends RObject {
 		return n_getLen(nativeObject());
 	}
 	
-	public Object[] toArray() {
+	public Value[] toArray() {
 		return n_getBuf(nativeObject());
 	}
 	
 	private static native int n_getLen(long array);
 	private static native int n_getCapa(long array);
-	private static native Object[] n_getBuf(long array);
+	private static native Value[] n_getBuf(long array);
 }
