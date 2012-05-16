@@ -1,4 +1,4 @@
-mruby
+jamruby
 ====
 
 __jamruby__ is Java to mruby bridge.
