@@ -113,6 +113,10 @@ public class Value {
 	
 	@Override
 	public String toString() {
+		return toString(null);
+	}
+	
+	public String toString(State state) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(type.toString()).append(": ");
 		switch(type) {
@@ -136,7 +140,7 @@ public class Value {
 			if (null != values) {
 				builder.append(String.format("<length=%d", values.length));
 				for (int i = 0; i < values.length; ++i) {
-					builder.append(String.format(", [%d]={%s}", i, values[i].toString()));
+					builder.append(String.format(", [%d]={%s}", i, values[i].toString(state)));
 				}
 				builder.append(">");
 			} else {
@@ -144,6 +148,11 @@ public class Value {
 			}
 			break;
 		case MRB_TT_SYMBOL:
+			if (null != state) {
+				builder.append(MRuby.sym2name(state, sym));
+				break;
+			}
+			// fall-through
 		case MRB_TT_CLASS:
 		case MRB_TT_DATA:
 		case MRB_TT_ENV:
