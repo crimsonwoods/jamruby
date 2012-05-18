@@ -8,6 +8,12 @@ Ready to build
 
     $ git clone https://github.com/mruby/mruby.git
     $ git clone https://github.com/crimsonwoods/jamruby.git
+    $ cd mruby
+    $ git clone https://github.com/crimsonwoods/mruby_ndk-build.git android
+    $ make
+    $ cd android/jni
+    $ ndk-build
+    $ cd ../../../jamruby
 
 'mruby' is needed for build 'jamruby'.<br/>
 And it has to place on same directory.<br/>
