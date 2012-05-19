@@ -5,7 +5,7 @@
 extern "C" {
 #include "mruby.h"
 #include "mruby/dump.h"
-#include "compile.h"
+#include "mruby/compile.h"
 #include "mruby/proc.h"
 #include "mruby/array.h"
 }

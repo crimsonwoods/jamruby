@@ -1,7 +1,7 @@
 #include "jni_AstNode.h"
 extern "C" {
 #include "mruby.h"
-#include "compile.h"
+#include "mruby/compile.h"
 }
 
 #include "safe_jni.hpp"

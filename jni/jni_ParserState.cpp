@@ -1,7 +1,7 @@
 #include "jni_ParserState.h"
 extern "C" {
 #include "mruby.h"
-#include "compile.h"
+#include "mruby/compile.h"
 }
 
 /*
