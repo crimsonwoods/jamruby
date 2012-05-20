@@ -1,6 +1,6 @@
 #include "jni_Pool.h"
 extern "C" {
-#include "pool.h"
+#include "mruby/compile.h"
 }
 /*
  * Class:     crimsonwoods_android_libs_jamruby_mruby_Pool
