@@ -1,4 +1,4 @@
-package crimsonwoods.android.libs.jamruby.mruby;
+package org.jamruby.mruby;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import crimsonwoods.android.libs.jamruby.io.FileDescriptorHelper;
+import org.jamruby.io.FileDescriptorHelper;
+
 
 public class MRuby {
 	public static State open() {

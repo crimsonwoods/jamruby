@@ -1,16 +1,17 @@
-package crimsonwoods.android.libs.jamruby;
+package org.jamruby.core;
 
 import java.io.File;
 import java.io.IOException;
 
-import crimsonwoods.android.libs.jamruby.exception.ParseException;
-import crimsonwoods.android.libs.jamruby.mruby.AstNode;
-import crimsonwoods.android.libs.jamruby.mruby.MRuby;
-import crimsonwoods.android.libs.jamruby.mruby.ParserState;
-import crimsonwoods.android.libs.jamruby.mruby.Pool;
-import crimsonwoods.android.libs.jamruby.mruby.RObject;
-import crimsonwoods.android.libs.jamruby.mruby.State;
-import crimsonwoods.android.libs.jamruby.mruby.Value;
+import org.jamruby.exception.ParseException;
+import org.jamruby.mruby.AstNode;
+import org.jamruby.mruby.MRuby;
+import org.jamruby.mruby.ParserState;
+import org.jamruby.mruby.Pool;
+import org.jamruby.mruby.RObject;
+import org.jamruby.mruby.State;
+import org.jamruby.mruby.Value;
+
 
 public class Jamruby {
 	private State state;

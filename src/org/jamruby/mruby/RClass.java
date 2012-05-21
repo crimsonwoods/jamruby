@@ -1,4 +1,4 @@
-package crimsonwoods.android.libs.jamruby.mruby;
+package org.jamruby.mruby;
 
 public class RClass extends RObject {
 	public RClass(long ptr) {

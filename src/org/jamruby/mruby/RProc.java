@@ -1,4 +1,4 @@
-package crimsonwoods.android.libs.jamruby.mruby;
+package org.jamruby.mruby;
 
 public class RProc extends RObject {
 	public RProc(long ptr) {

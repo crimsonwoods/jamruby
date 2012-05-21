@@ -8,11 +8,11 @@ inline static RBasic *to_ptr(jlong basic) {
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RBasic
+ * Class:     org_jamruby_mruby_RBasic
  * Method:    n_getValueType
  * Signature: (J)I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1getValueType
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getValueType
   (JNIEnv *env, jclass clazz, jlong basic)
 {
 	RBasic *rbasic = to_ptr(basic);
@@ -20,11 +20,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1ge
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RBasic
+ * Class:     org_jamruby_mruby_RBasic
  * Method:    n_getColor
  * Signature: (J)I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1getColor
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getColor
   (JNIEnv *env, jclass clazz, jlong basic)
 {
 	RBasic *rbasic = to_ptr(basic);
@@ -32,11 +32,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1ge
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RBasic
+ * Class:     org_jamruby_mruby_RBasic
  * Method:    n_getFlags
  * Signature: (J)I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1getFlags
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getFlags
   (JNIEnv *env, jclass clazz, jlong basic)
 {
 	RBasic *rbasic = to_ptr(basic);
@@ -44,11 +44,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1ge
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RBasic
+ * Class:     org_jamruby_mruby_RBasic
  * Method:    n_getRClass
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1getRClass
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RBasic_n_1getRClass
   (JNIEnv *env, jclass clazz, jlong basic)
 {
 	RBasic *rbasic = to_ptr(basic);
@@ -56,11 +56,11 @@ JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1g
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RBasic
+ * Class:     org_jamruby_mruby_RBasic
  * Method:    n_getGCNext
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RBasic_n_1getGCNext
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RBasic_n_1getGCNext
   (JNIEnv *env, jclass clazz, jlong basic)
 {
 	RBasic *rbasic = to_ptr(basic);

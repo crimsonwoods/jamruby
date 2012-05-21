@@ -3,11 +3,11 @@ extern "C" {
 #include "mruby/compile.h"
 }
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_Pool
+ * Class:     org_jamruby_mruby_Pool
  * Method:    n_close
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_Pool_n_1close
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_Pool_n_1close
   (JNIEnv *env, jclass clazz, jlong pool)
 {
 	mrb_pool *p = reinterpret_cast<mrb_pool*>(static_cast<intptr_t>(pool));

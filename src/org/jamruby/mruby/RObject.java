@@ -1,4 +1,4 @@
-package crimsonwoods.android.libs.jamruby.mruby;
+package org.jamruby.mruby;
 
 public class RObject extends RBasic {
 	public RObject(long ptr) {

@@ -26,11 +26,11 @@ static inline mrb_sym to_sym(jlong &sym) {
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_strNew
- * Signature: (JLjava/lang/String;)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ * Signature: (JLjava/lang/String;)Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1strNew
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1strNew
   (JNIEnv *env, jclass clazz, jlong mrb, jstring str)
 {
 	safe_jni::safe_string jstr(env, str);
@@ -40,22 +40,22 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_open
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1open
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1open
   (JNIEnv *env, jclass clazz)
 {
 	return static_cast<jlong>(reinterpret_cast<intptr_t>(mrb_open()));
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_loadIrep
  * Signature: (JLjava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1loadIrep
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1loadIrep
   (JNIEnv *env, jclass clazz, jlong mrb, jstring path)
 {
 	int n = -1;
@@ -74,11 +74,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1loa
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_parseString
  * Signature: (JLjava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1parseString
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1parseString
   (JNIEnv *env, jclass clazz, jlong mrb, jstring command)
 {
 	mrb_parser_state *state = NULL;
@@ -99,11 +99,11 @@ JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1pa
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_parseFile
  * Signature: (JLjava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1parseFile
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1parseFile
   (JNIEnv *env, jclass clazz, jlong mrb, jstring path)
 {
 	mrb_parser_state *state = NULL;
@@ -121,11 +121,11 @@ JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1pa
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_generateCode
  * Signature: (JJ)I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1generateCode
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1generateCode
   (JNIEnv *env, jclass clazz, jlong mrb, jlong node)
 {
 	mrb_ast_node *ast_node = to_ptr<mrb_ast_node>(node);
@@ -133,11 +133,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1gen
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_run
- * Signature: (JJLcrimsonwoods/android/libs/jamruby/mruby/Value;)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ * Signature: (JJLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1run
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1run
   (JNIEnv *env, jclass clazz, jlong mrb, jlong proc, jobject value)
 {
 	mrb_value val = { { 0, } };
@@ -150,11 +150,11 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_defineGlobalConst
- * Signature: (JLjava/lang/String;Lcrimsonwoods/android/libs/jamruby/mruby/Value;)V
+ * Signature: (JLjava/lang/String;Lorg/jamruby/mruby/Value;)V
  */
-JNIEXPORT void JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1defineGlobalConst
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1defineGlobalConst
   (JNIEnv *env, jclass clazz, jlong mrb, jstring name, jobject value)
 {
 	safe_jni::safe_string vname(env, name);
@@ -166,11 +166,11 @@ JNIEXPORT void JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1def
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_arrayNew
- * Signature: (J)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ * Signature: (J)Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1arrayNew
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1arrayNew
   (JNIEnv *env, jclass clazz, jlong mrb)
 {
 	mrb_value const &value = mrb_ary_new(MRBSTATE(mrb));
@@ -179,11 +179,11 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_arrayPush
- * Signature: (JLcrimsonwoods/android/libs/jamruby/mruby/Value;Lcrimsonwoods/android/libs/jamruby/mruby/Value;)V
+ * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)V
  */
-JNIEXPORT void JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1arrayPush
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1arrayPush
   (JNIEnv *env, jclass clazz, jlong mrb, jobject array, jobject elem)
 {
 	mrb_value varray = { { 0, } };
@@ -198,11 +198,11 @@ JNIEXPORT void JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1arr
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_procNew
  * Signature: (JJ)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1procNew
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1procNew
   (JNIEnv *env, jclass clazz, jlong mrb, jlong irep)
 {
 	RProc *rproc = mrb_proc_new(MRBSTATE(mrb), to_ptr<mrb_irep>(irep));
@@ -210,14 +210,14 @@ JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1pr
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_topSelf
- * Signature: (J)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ * Signature: (J)Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1topSelf
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1topSelf
   (JNIEnv *env, jclass clazz, jlong mrb)
 {
-	safe_jni::safe_local_ref<jclass> vclazz(env, env->FindClass("crimsonwoods/android/libs/jamruby/mruby/Value"));
+	safe_jni::safe_local_ref<jclass> vclazz(env, env->FindClass("org/jamruby/mruby/Value"));
 	if (!vclazz) {
 		return NULL;
 	}
@@ -231,11 +231,11 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_p
- * Signature: (JLcrimsonwoods/android/libs/jamruby/mruby/Value;)Lcrimsonwoods/android/libs/jamruby/mruby/Value;
+ * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1p
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1p
   (JNIEnv *env, jclass clazz, jlong mrb, jobject value)
 {
 	mrb_value val = { { 0, } };
@@ -249,11 +249,11 @@ JNIEXPORT jobject JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_sym2name
  * Signature: (JJ)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1sym2name
+JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_MRuby_n_1sym2name
   (JNIEnv *env, jclass clazz, jlong mrb, jlong sym)
 {
 	safe_jni::safe_local_ref<jstring> jstr(env, env->NewStringUTF(mrb_sym2name(MRBSTATE(mrb), to_sym(sym))));
@@ -261,11 +261,11 @@ JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_redirect_stdout
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stdout
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1redirect_1stdout
   (JNIEnv *env, jclass clazz)
 {
 	int stdout_pipe[2] = { -1, -1 };
@@ -282,11 +282,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1red
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_redirect_stderr
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stderr
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1redirect_1stderr
   (JNIEnv *env, jclass clazz)
 {
 	int stderr_pipe[2] = { -1, -1 };
@@ -303,11 +303,11 @@ JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1red
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_MRuby
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_redirect_stdin
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_MRuby_n_1redirect_1stdin
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1redirect_1stdin
   (JNIEnv *env, jclass clazz)
 {
 	int stdin_pipe[2] = { -1, -1 };

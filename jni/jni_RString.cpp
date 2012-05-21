@@ -11,11 +11,11 @@ inline static RString *to_ptr(jlong str) {
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RString
+ * Class:     org_jamruby_mruby_RString
  * Method:    n_getBuf
  * Signature: (J)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RString_n_1getBuf
+JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_RString_n_1getBuf
   (JNIEnv *env, jclass clazz, jlong str)
 {
 	safe_jni::safe_local_ref<jstring> jstr(env, env->NewStringUTF(to_ptr(str)->buf));

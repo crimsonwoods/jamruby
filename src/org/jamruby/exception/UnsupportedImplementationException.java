@@ -1,4 +1,4 @@
-package crimsonwoods.android.libs.jamruby.exception;
+package org.jamruby.exception;
 
 @SuppressWarnings("serial")
 public class UnsupportedImplementationException extends RuntimeException {

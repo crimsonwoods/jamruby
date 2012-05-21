@@ -13,7 +13,7 @@ static inline int valueAsInt(JNIEnv *env, jclass cls, jobject value)
 
 static inline void *valueAsPtr(JNIEnv *env, jclass cls, jobject value)
 {
-    jmethodID mid = env->GetMethodID(cls, "asObject", "()Lcrimsonwoods/android/libs/jamruby/mruby/RBasic;");
+    jmethodID mid = env->GetMethodID(cls, "asObject", "()Lorg/jamruby/mruby/RBasic;");
     if (NULL == mid) {
         return NULL;
     }
@@ -21,7 +21,7 @@ static inline void *valueAsPtr(JNIEnv *env, jclass cls, jobject value)
     if (!robj) {
         return NULL;
     }
-    safe_jni::safe_local_ref<jclass> robj_cls(env, env->FindClass("crimsonwoods/android/libs/jamruby/mruby/RBasic"));
+    safe_jni::safe_local_ref<jclass> robj_cls(env, env->FindClass("org/jamruby/mruby/RBasic"));
     if (!robj_cls) {
         return NULL;
     }
@@ -49,8 +49,8 @@ static inline mrb_float valueAsFloat(JNIEnv *env, jclass cls, jobject value)
 
 bool create_mrb_value(JNIEnv *env, jobject value, mrb_value &store)
 {
-    char const value_class_name[]      = "crimsonwoods/android/libs/jamruby/mruby/Value";
-    char const value_type_class_name[] = "crimsonwoods/android/libs/jamruby/mruby/ValueType";
+    char const value_class_name[]      = "org/jamruby/mruby/Value";
+    char const value_type_class_name[] = "org/jamruby/mruby/ValueType";
     safe_jni::safe_local_ref<jclass> vclazz(env, env->FindClass(value_class_name));
     if (!vclazz) {
         return false;
@@ -60,7 +60,7 @@ bool create_mrb_value(JNIEnv *env, jobject value, mrb_value &store)
         return false;
     }
 
-    jmethodID type_mid = env->GetMethodID(vclazz.get(), "type", "()Lcrimsonwoods/android/libs/jamruby/mruby/ValueType;");
+    jmethodID type_mid = env->GetMethodID(vclazz.get(), "type", "()Lorg/jamruby/mruby/ValueType;");
     if (!type_mid) {
         return false;
     }
@@ -69,7 +69,7 @@ bool create_mrb_value(JNIEnv *env, jobject value, mrb_value &store)
         return false;
     }
 
-    jmethodID toint_mid = env->GetStaticMethodID(vtclazz.get(), "toInteger", "(Lcrimsonwoods/android/libs/jamruby/mruby/ValueType;)I");
+    jmethodID toint_mid = env->GetStaticMethodID(vtclazz.get(), "toInteger", "(Lorg/jamruby/mruby/ValueType;)I");
     if (!toint_mid) {
         return false;
     }
@@ -151,7 +151,7 @@ static inline jobject new_value_sym(JNIEnv *env, jclass cls, mrb_sym value) {
 }
 
 jobject create_value(JNIEnv *env, mrb_value const &value) {
-    safe_jni::safe_local_ref<jclass> cls(env, env->FindClass("crimsonwoods/android/libs/jamruby/mruby/Value"));
+    safe_jni::safe_local_ref<jclass> cls(env, env->FindClass("org/jamruby/mruby/Value"));
     if (!cls) {
         return NULL;
     }

@@ -1,6 +1,6 @@
-package crimsonwoods.android.libs.jamruby.mruby;
+package org.jamruby.mruby;
 
-import crimsonwoods.android.libs.jamruby.Jamruby;
+import org.jamruby.core.Jamruby;
 
 public class State {
 	private long nativeObj;

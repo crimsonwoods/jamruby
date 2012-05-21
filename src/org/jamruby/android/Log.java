@@ -1,4 +1,4 @@
-package crimsonwoods.android.libs.jamruby;
+package org.jamruby.android;
 
 public class Log {
 	private static final String LOG_TAG = "jamruby";

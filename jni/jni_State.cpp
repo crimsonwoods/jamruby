@@ -6,16 +6,16 @@ extern "C" {
 #include <cstddef>
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_State
+ * Class:     org_jamruby_mruby_State
  * Method:    n_getIreps
- * Signature: (J)[Lcrimsonwoods/android/libs/jamruby/mruby/Irep;
+ * Signature: (J)[Lorg/jamruby/mruby/Irep;
  */
-JNIEXPORT jobjectArray JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_State_n_1getIreps
+JNIEXPORT jobjectArray JNICALL Java_org_jamruby_mruby_State_n_1getIreps
   (JNIEnv *env, jclass clazz, jlong mrb)
 {
 	mrb_state* s = reinterpret_cast<mrb_state*>(static_cast<intptr_t>(mrb));
 	size_t const len = s->irep_len;
-	safe_jni::safe_local_ref<jclass> irep_clazz(env, env->FindClass("crimsonwoods/android/libs/jamruby/mruby/Irep"));
+	safe_jni::safe_local_ref<jclass> irep_clazz(env, env->FindClass("org/jamruby/mruby/Irep"));
 	if (!irep_clazz) {
 		return NULL;
 	}
@@ -35,11 +35,11 @@ JNIEXPORT jobjectArray JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_Stat
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_State
+ * Class:     org_jamruby_mruby_State
  * Method:    n_getExc
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_State_n_1getExc
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_State_n_1getExc
   (JNIEnv *env, jclass clazz, jlong mrb)
 {
 	RObject *exc = reinterpret_cast<mrb_state*>(static_cast<intptr_t>(mrb))->exc;
@@ -47,11 +47,11 @@ JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_State_n_1ge
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_State
+ * Class:     org_jamruby_mruby_State
  * Method:    n_close
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_State_n_1close
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_State_n_1close
   (JNIEnv *env, jclass clazz, jlong mrb)
 {
 	mrb_close(reinterpret_cast<mrb_state*>(static_cast<intptr_t>(mrb)));

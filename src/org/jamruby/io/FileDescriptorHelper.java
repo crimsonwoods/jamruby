@@ -1,10 +1,11 @@
-package crimsonwoods.android.libs.jamruby.io;
+package org.jamruby.io;
 
 import java.io.FileDescriptor;
 import java.lang.reflect.Field;
 
-import crimsonwoods.android.libs.jamruby.Log;
-import crimsonwoods.android.libs.jamruby.exception.UnsupportedImplementationException;
+import org.jamruby.android.Log;
+import org.jamruby.exception.UnsupportedImplementationException;
+
 
 public class FileDescriptorHelper {
 	private FileDescriptorHelper() {
@@ -16,6 +17,13 @@ public class FileDescriptorHelper {
 		return desc;
 	}
 	
+	/**
+	 * Set a descriptor of file to 'FileDescriptor' class instance via reflection.
+	 * This implementation is specified for Android platform.
+	 * @param desc FileDescriptor class instance.
+	 * @param fd descriptor of file that depends on platform.
+	 * @throws UnsupportedImplementationException
+	 */
 	private static final void setFileDescriptor(FileDescriptor desc, int fd) throws UnsupportedImplementationException {
 		try {
 			final Field field = desc.getClass().getDeclaredField("descriptor");

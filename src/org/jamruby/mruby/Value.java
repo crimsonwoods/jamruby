@@ -1,6 +1,6 @@
-package crimsonwoods.android.libs.jamruby.mruby;
+package org.jamruby.mruby;
 
-import crimsonwoods.android.libs.jamruby.exception.NotImplementedException;
+import org.jamruby.exception.NotImplementedException;
 
 public class Value {
 	private ValueType type;

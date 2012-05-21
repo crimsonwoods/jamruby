@@ -5,11 +5,11 @@ extern "C" {
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RProc
+ * Class:     org_jamruby_mruby_RProc
  * Method:    n_getTargetClass
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RProc_n_1getTargetClass
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RProc_n_1getTargetClass
   (JNIEnv *env, jclass clazz, jlong proc)
 {
 	RProc *rproc = reinterpret_cast<RProc*>(static_cast<intptr_t>(proc));
@@ -17,11 +17,11 @@ JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RProc_n_1ge
 }
 
 /*
- * Class:     crimsonwoods_android_libs_jamruby_mruby_RProc
+ * Class:     org_jamruby_mruby_RProc
  * Method:    n_getEnv
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_crimsonwoods_android_libs_jamruby_mruby_RProc_n_1getEnv
+JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RProc_n_1getEnv
   (JNIEnv *env, jclass clazz, jlong proc)
 {
 	RProc *rproc = reinterpret_cast<RProc*>(static_cast<intptr_t>(proc));
