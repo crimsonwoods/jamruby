@@ -111,6 +111,10 @@ public class Value {
 		return ((RArray)obj).toArray();
 	}
 	
+	public int id() {
+		return n_obj_id();
+	}
+	
 	@Override
 	public String toString() {
 		return toString(null);
@@ -180,4 +184,6 @@ public class Value {
 		}
 		return builder.toString();
 	}
+	
+	private native int n_obj_id();
 }
