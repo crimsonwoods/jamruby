@@ -143,7 +143,6 @@ public class MRuby {
 	private static native long n_parseString(long mrb, String command);
 	private static native long n_parseFile(long mrb, String path) throws FileNotFoundException;
 	private static native int n_generateCode(long mrb, long node);
-	private static native void n_defineGlobalConst(long mrb, String name, Value value);
 	private static native Value n_arrayNew(long mrb);
 	private static native void n_arrayPush(long mrb, Value array, Value elem);
 	private static native long n_procNew(long mrb, long irep);
@@ -187,6 +186,7 @@ public class MRuby {
 	private static native Value n_strNew(long mrb, String str);
 	
 	private static native long n_open();
+	private static native int n_checkstack(long mrb, int size);
 	
 	private static native Value n_topSelf(long mrb);
 	private static native Value n_run(long mrb, long proc, Value value);
@@ -194,12 +194,40 @@ public class MRuby {
 	private static native Value n_p(long mrb, Value obj);
 	private static native long n_toId(long mrb, Value name);
 	
+	private static native int n_obj_equal(long mrb, Value left, Value right);
+	private static native int n_equal(long mrb, Value left, Value right);
+	private static native Value n_Integer(long mrb, Value val);
+	private static native Value n_Float(long mrb, Value val);
+	private static native Value n_inspect(long mrb, Value obj);
+	private static native int n_eql(long mrb, Value left, Value right);
+	
+	private static native Value n_check_convert_type(long mrb, Value val, int type, String tname, String method);
 	private static native Value n_anyToS(long mrb, Value value);
 	private static native String n_objClassname(long mrb, Value obj);
 	private static native long n_objClass(long mrb, Value obj);
 	private static native Value n_classPath(long mrb, long cls);
+	private static native Value n_convert_type(long mrb, Value val, int type, String tname, String method);
+	private static native int n_obj_is_kind_of(long mrb, Value obj, long c);
 	private static native Value n_objInspect(long mrb, Value self);
 	private static native Value n_objClone(long mrb, Value self);
+	private static native Value n_check_funcall(long mrb, Value recv, long mid, int argc, Value[] argv);
+	
+	private static native int n_block_given_p();
+	private static native void n_raise(long mrb, long c, String message);
+	private static native void n_rb_raise(long c, String message);
+	private static native void n_warn(String message);
+	private static native void n_warning(String message);
+	private static native void n_bug(String message);
+	
+	private static native Value n_yield(long mrb, Value v, Value blk);
+	private static native Value n_yield_argv(long mrb, Value b, int argc, Value[] argv);
+	private static native Value n_yield_with_self(long mrb, Value b, int argc, Value[] argv, Value self);
+	private static native Value n_class_new_instance(long mrb, int argc, Value[] argv, long c);
+	private static native Value n_class_new_instance_m(long mrb, Value c);
+	
+	private static native void n_defineAlias(long mrb, long c, String name1, String name2);
+	private static native String n_className(long mrb, long c);
+	private static native void n_defineGlobalConst(long mrb, String name, Value value);
 	
 	static {
 		System.loadLibrary("jamruby");

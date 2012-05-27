@@ -701,6 +701,17 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1open
 
 /*
  * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_checkstack
+ * Signature: (JI)I
+ */
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1checkstack
+  (JNIEnv *env, jclass, jlong mrb, jint size)
+{
+	return mrb_checkstack(MRBSTATE(mrb), size);
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_topSelf
  * Signature: (J)Lorg/jamruby/mruby/Value;
  */
@@ -773,6 +784,130 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1toId
 
 /*
  * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_obj_equal
+ * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)I
+ */
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1obj_1equal
+  (JNIEnv *env, jclass, jlong mrb, jobject left, jobject right)
+{
+	mrb_value left_val, right_val;
+	if (!create_mrb_value(env, left, left_val)) {
+		return 0;
+	}
+	if (!create_mrb_value(env, right, right_val)) {
+		return 0;
+	}
+	return mrb_obj_equal(MRBSTATE(mrb), left_val, right_val);
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_equal
+ * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)I
+ */
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1equal
+  (JNIEnv *env, jclass, jlong mrb, jobject left, jobject right)
+{
+	mrb_value left_val, right_val;
+	if (!create_mrb_value(env, left, left_val)) {
+		return 0;
+	}
+	if (!create_mrb_value(env, right, right_val)) {
+		return 0;
+	}
+	return mrb_equal(MRBSTATE(mrb), left_val, right_val);
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_Integer
+ * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1Integer
+  (JNIEnv *env, jclass, jlong mrb, jobject value)
+{
+	mrb_value val;
+	if (!create_mrb_value(env, value, val)) {
+		return NULL;
+	}
+	mrb_value const &ret = mrb_Integer(MRBSTATE(mrb), val);
+	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
+	return result.get();
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_Float
+ * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1Float
+  (JNIEnv *env, jclass, jlong mrb, jobject value)
+{
+	mrb_value val;
+	if (!create_mrb_value(env, value, val)) {
+		return NULL;
+	}
+	mrb_value const &ret = mrb_Float(MRBSTATE(mrb), val);
+	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
+	return result.get();
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_inspect
+ * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1inspect
+  (JNIEnv *env, jclass, jlong mrb, jobject value)
+{
+	mrb_value val;
+	if (!create_mrb_value(env, value, val)) {
+		return NULL;
+	}
+	mrb_value const &ret = mrb_inspect(MRBSTATE(mrb), val);
+	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
+	return result.get();
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_eql
+ * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)I
+ */
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1eql
+  (JNIEnv *env, jclass, jlong mrb, jobject left, jobject right)
+{
+	mrb_value left_val, right_val;
+	if (!create_mrb_value(env, left, left_val)) {
+		return 0;
+	}
+	if (!create_mrb_value(env, right, right_val)) {
+		return 0;
+	}
+	return mrb_eql(MRBSTATE(mrb), left_val, right_val);
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_check_convert_type
+ * Signature: (JLorg/jamruby/mruby/Value;ILjava/lang/String;Ljava/lang/String;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1check_1convert_1type
+  (JNIEnv *env, jclass, jlong mrb, jobject value, jint type, jstring tname, jstring method)
+{
+	mrb_value val;
+	if (!create_mrb_value(env, value, val)) {
+		return NULL;
+	}
+	safe_jni::safe_string type_name(env, tname);
+	safe_jni::safe_string method_name(env, method);
+	mrb_value const &ret = mrb_check_convert_type(MRBSTATE(mrb), val, type, type_name.string(), method_name.string());
+	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
+	return result.get();
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_anyToS
  * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
  */
@@ -839,6 +974,40 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1classPath
 
 /*
  * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_convert_type
+ * Signature: (JLorg/jamruby/mruby/Value;ILjava/lang/String;Ljava/lang/String;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1convert_1type
+  (JNIEnv *env, jclass, jlong mrb, jobject value, jint type, jstring tname, jstring method)
+{
+	mrb_value val;
+	if (!create_mrb_value(env, value, val)) {
+		return NULL;
+	}
+	safe_jni::safe_string type_name(env, tname);
+	safe_jni::safe_string method_name(env, method);
+	mrb_value const &ret = mrb_convert_type(MRBSTATE(mrb), val, type, type_name.string(), method_name.string());
+	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
+	return result.get();
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_obj_is_kind_of
+ * Signature: (JLorg/jamruby/mruby/Value;J)I
+ */
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1obj_1is_1kind_1of
+  (JNIEnv *env, jclass, jlong mrb, jobject obj, jlong c)
+{
+	mrb_value val;
+	if (!create_mrb_value(env, obj, val)) {
+		return -1;
+	}
+	return mrb_obj_is_kind_of(MRBSTATE(mrb), val, to_ptr<RClass>(c));
+}
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
  * Method:    n_objInspect
  * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
  */
@@ -870,6 +1039,126 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1objClone
 	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
 	return result.get();
 }
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_check_funcall
+ * Signature: (JLorg/jamruby/mruby/Value;JI[Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1check_1funcall
+  (JNIEnv *, jclass, jlong, jobject, jlong, jint, jobjectArray);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_block_given_p
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1block_1given_1p
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_raise
+ * Signature: (JJLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1raise
+  (JNIEnv *, jclass, jlong, jlong, jstring);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_rb_raise
+ * Signature: (JLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1rb_1raise
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_warn
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1warn
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_warning
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1warning
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_bug
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1bug
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_yield
+ * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1yield
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_yield_argv
+ * Signature: (JLorg/jamruby/mruby/Value;I[Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1yield_1argv
+  (JNIEnv *, jclass, jlong, jobject, jint, jobjectArray);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_yield_with_self
+ * Signature: (JLorg/jamruby/mruby/Value;I[Lorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1yield_1with_1self
+  (JNIEnv *, jclass, jlong, jobject, jint, jobjectArray, jobject);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_class_new_instance
+ * Signature: (JI[Lorg/jamruby/mruby/Value;J)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1class_1new_1instance
+  (JNIEnv *, jclass, jlong, jint, jobjectArray, jlong);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_class_new_instance_m
+ * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ */
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1class_1new_1instance_1m
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_defineAlias
+ * Signature: (JJLjava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1defineAlias
+  (JNIEnv *, jclass, jlong, jlong, jstring, jstring);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_className
+ * Signature: (JJ)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_MRuby_n_1className
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_defineGlobalConst
+ * Signature: (JLjava/lang/String;Lorg/jamruby/mruby/Value;)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1defineGlobalConst
+  (JNIEnv *, jclass, jlong, jstring, jobject);
 
 
 static mrb_value *create_mrb_value_array(JNIEnv *env, int const &argc, jobjectArray array)
