@@ -52,6 +52,47 @@ public class MRuby {
 		return new RProc(n_procNew(state.nativeObject(), irep.nativeObject()));
 	}
 	
+	
+	public static RClass defineClass(State state, String name, RClass superClass) {
+		return new RClass(n_defineClass(state.nativeObject(), name, superClass.nativeObject()));
+	}
+	
+	public static RClass defineModule(State state, String name) {
+		return new RClass(n_defineModule(state.nativeObject(), name));
+	}
+	
+	public static Value singletonClass(State state, Value value) {
+		return n_singletonClass(state.nativeObject(), value);
+	}
+	
+	public static void includeModule(State state, RClass c, RClass m) {
+		n_includeModule(state.nativeObject(), c.nativeObject(), m.nativeObject());
+	}
+	
+	public static void defineMethod(State state, RClass c, String name, RFunc func, int aspec) {
+		n_defineMethod(state.nativeObject(), c.nativeObject(), name, func, aspec);
+	}
+	
+	public static void defineClassMethod(State state, RClass c, String name, RFunc func, int aspec) {
+		n_defineClassMethod(state.nativeObject(), c.nativeObject(), name, func, aspec);
+	}
+	
+	public static void defineSingletonMethod(State state, RObject obj, String name, RFunc func, int aspec) {
+		n_defineSingletonMethod(state.nativeObject(), obj.nativeObject(), name, func, aspec);
+	}
+	
+	public static void defineModuleFunction(State state, RClass m, String name, RFunc func, int aspec) {
+		n_defineModuleFunction(state.nativeObject(), m.nativeObject(), name, func, aspec);
+	}
+	
+	public static void defineConst(State state, RClass m, String name, Value value) {
+		n_defineConst(state.nativeObject(), m.nativeObject(), name, value);
+	}
+	
+	public static Value instanceNew(State state, Value cv) {
+		return n_instanceNew(state.nativeObject(), cv);
+	}
+	
 	public static Value strNew(State state, String str) {
 		return n_strNew(state.nativeObject(), str);
 	}
@@ -117,7 +158,7 @@ public class MRuby {
 	private static native void n_defineClassMethod(long mrb, long c, String name, RFunc func, int aspec);
 	private static native void n_defineSingletonMethod(long mrb, long obj, String name, RFunc func, int aspec);
 	private static native void n_defineModuleFunction(long mrb, long m, String name, RFunc func, int aspec);
-	private static native void n_defineConst(long mrb, long c, String name, Value value);
+	private static native void n_defineConst(long mrb, long m, String name, Value value);
 	private static native Value n_instanceNew(long mrb, Value cv);
 	private static native long n_classNew(long mrb, long superClass);
 	private static native long n_moduleNew(long mrb);

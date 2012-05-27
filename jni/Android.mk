@@ -1,5 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 RUBY_ROOT  := $(LOCAL_PATH)/../../mruby
+#EXTRA_FLAGS:=
+EXTRA_FLAGS:= -DNO_DEBUG_LOG
 
 $(shell mkdir -p $(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI))
 $(shell cp $(RUBY_ROOT)/android/obj/local/$(TARGET_ARCH_ABI)/libmruby_lib.a $(LOCAL_PATH)/../obj/local/$(TARGET_ARCH_ABI)/libmruby.a)
@@ -14,7 +16,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE           := jamruby
-LOCAL_CPPFLAGS         := -Wall -Werror -O3 -DNO_DEBUG_LOG
+LOCAL_CPPFLAGS         := -Wall -Werror -O3 $(EXTRA_FLAGS)
 LOCAL_SRC_FILES        := $(wildcard *.cpp) $(wildcard *.c) mrblib/mrblib.c
 LOCAL_C_INCLUDES       := $(RUBY_ROOT)/include $(RUBY_ROOT)/src
 LOCAL_LDLIBS           := -llog 

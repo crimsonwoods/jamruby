@@ -30,13 +30,13 @@ public:
 		}
 	}
 	T& operator[] (int const &index) {
-		if ((index < 0) || ((size_t)index >= size_)) {
+		if ((index < 0) || (static_cast<size_t>(index) >= size_)) {
 			throw safe_jni::index_out_of_bounds_exception("Index out of bounds");
 		}
 		return ptr_[index];
 	}
 	T const& operator[] (int const &index) const {
-		if ((index < 0) || ((size_t)index >= size_)) {
+		if ((index < 0) || (static_cast<size_t>(index) >= size_)) {
 			throw safe_jni::index_out_of_bounds_exception("Index out of bounds");
 		}
 		return ptr_[index];
@@ -58,6 +58,33 @@ public:
 	}
 	bool is_aborted() const {
 		return is_aborted_;
+	}
+};
+
+class safe_object_array {
+private:
+	JNIEnv *env_;
+	jobjectArray const &array_;
+	size_t size_;
+public:
+	safe_object_array(JNIEnv *env, jobjectArray array)
+		: env_(env), array_(array) {
+		size_ = env->GetArrayLength(array);
+	}
+	~safe_object_array() {
+	}
+
+	jobject get(int const &index) const {
+		if ((index < 0) || (static_cast<size_t>(index) > size_)) {
+			throw safe_jni::index_out_of_bounds_exception("Index out of bounds.");
+		}
+		return env_->GetObjectArrayElement(array_, index);
+	}
+	void set(int const &index, jobject item) {
+		env_->SetObjectArrayElement(array_, index, item);
+	}
+	size_t size() const {
+		return size_;
 	}
 };
 
