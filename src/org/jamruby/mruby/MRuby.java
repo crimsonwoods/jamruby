@@ -8,14 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.jamruby.core.Jamruby;
+import org.jamruby.exception.UnsupportedImplementationException;
 import org.jamruby.io.FileDescriptorHelper;
 
 
 public class MRuby {
-	public static State open() {
-		return new State(n_open());
-	}
-	
 	public static int loadIrep(State state, File f) throws FileNotFoundException {
 		return n_loadIrep(state.nativeObject(), f.getAbsolutePath());
 	}
@@ -32,14 +30,6 @@ public class MRuby {
 		return n_generateCode(state.nativeObject(), node.nativeObject());
 	}
 	
-	public static Value run(State state, RProc proc, Value value) {
-		return n_run(state.nativeObject(), proc.nativeObject(), value);
-	}
-	
-	public static void defineGlobalConst(State state, String name, Value value) {
-		n_defineGlobalConst(state.nativeObject(), name, value);
-	}
-	
 	public static Value arrayNew(State state) {
 		return n_arrayNew(state.nativeObject());
 	}
@@ -51,7 +41,6 @@ public class MRuby {
 	public static RProc procNew(State state, Irep irep) {
 		return new RProc(n_procNew(state.nativeObject(), irep.nativeObject()));
 	}
-	
 	
 	public static RClass defineClass(State state, String name, RClass superClass) {
 		return new RClass(n_defineClass(state.nativeObject(), name, superClass.nativeObject()));
@@ -93,20 +82,249 @@ public class MRuby {
 		return n_instanceNew(state.nativeObject(), cv);
 	}
 	
+	public static RClass classNew(State state) {
+		return classNew(state, null);
+	}
+	
+	public static RClass classNew(State state, RClass superClass) {
+		if (null == superClass) {
+			return new RClass(n_classNew(state.nativeObject(), Jamruby.UNAVAILABLE_NATIVE_OBJECT));
+		} else {
+			return new RClass(n_classNew(state.nativeObject(), superClass.nativeObject()));
+		}
+	}
+	
+	public static RClass moduleNew(State state) {
+		return new RClass(n_moduleNew(state.nativeObject()));
+	}
+	
+	public static RClass classFromSym(State state, RClass c, Symbol name) {
+		return new RClass(n_classFromSym(state.nativeObject(), c.nativeObject(), name.nativeObject()));
+	}
+	
+	public static RClass classGet(State state, String name) {
+		return new RClass(n_classGet(state.nativeObject(), name));
+	}
+	
+	public static RClass classObjGet(State state, String name) {
+		return new RClass(n_classObjGet(state.nativeObject(), name));
+	}
+	
+	public static Value objDup(State state, Value obj) {
+		return n_objDup(state.nativeObject(), obj);
+	}
+	
+	public static Value checkToInteger(State state, Value val, String method) {
+		return n_checkToInteger(state.nativeObject(), val, method);
+	}
+	
+	public static int objRespondTo(RClass c, Symbol mid) {
+		return n_objRespondTo(c.nativeObject(), mid.nativeObject());
+	}
+	
+	public static RClass defineClassUnder(State state, RClass outerClass, String name) {
+		return defineClassUnder(state, outerClass, name, null);
+	}
+	
+	public static RClass defineClassUnder(State state, RClass outerClass, String name, RClass superClass) {
+		if (null == superClass) {
+			return new RClass(n_defineClassUnder(state.nativeObject(), outerClass.nativeObject(), name, Jamruby.UNAVAILABLE_NATIVE_OBJECT));
+		} else {
+			return new RClass(n_defineClassUnder(state.nativeObject(), outerClass.nativeObject(), name, superClass.nativeObject()));
+		}
+	}
+	
+	public static RClass defineModuleUnder(State state, RClass outerClass, String name) {
+		return new RClass(n_defineModuleUnder(state.nativeObject(), outerClass.nativeObject(), name));
+	}
+	
+	public static Value funcall(State state, Value self, String name, int argc, Value...argv) {
+		return n_funcall(state.nativeObject(), self, name, argc, argv);
+	}
+	
+	public static Value funcallWithBlock(State state, Value self, String name, int argc, Value[] argv, Value blk) {
+		return n_funcallWithBlock(state.nativeObject(), self, name, argc, argv, blk);
+	}
+	
+	public static Symbol intern(State state, String name) {
+		return new Symbol(n_intern(state.nativeObject(), name));
+	}
+	
+	public static String sym2name(State state, Symbol sym) {
+		return n_sym2name(state.nativeObject(), sym.nativeObject());
+	}
+	
+	public static Value strFormat(State state, int argc, Value[] argv, Value fmt) {
+		return n_strFormat(state.nativeObject(), argc, argv, fmt);
+	}
+	
+	public static Pointer malloc(State state, long size) {
+		return new Pointer(n_malloc(state.nativeObject(), size));
+	}
+	
+	public static Pointer calloc(State state, long nelem, long len) {
+		return new Pointer(n_calloc(state.nativeObject(), nelem, len));
+	}
+	
+	public static Pointer realloc(State state, Pointer ptr, long len) {
+		return new Pointer(n_realloc(state.nativeObject(), ptr.nativePointer(), len));
+	}
+	
+	public static RBasic objAlloc(State state, int vtype, RClass cls) {
+		return new RBasic(n_objAlloc(state.nativeObject(), vtype, cls.nativeObject()));
+	}
+	
+	public static Pointer free(State state, Pointer ptr) {
+		return new Pointer(n_free(state.nativeObject(), ptr.nativePointer()));
+	}
+	
 	public static Value strNew(State state, String str) {
 		return n_strNew(state.nativeObject(), str);
+	}
+	
+	public static State open() {
+		return new State(n_open());
+	}
+	
+	public static int checkstack(State state, int size) {
+		return n_checkstack(state.nativeObject(), size);
 	}
 	
 	public static Value topSelf(State state) {
 		return n_topSelf(state.nativeObject());
 	}
 	
+	public static Value run(State state, RProc proc, Value value) {
+		return n_run(state.nativeObject(), proc.nativeObject(), value);
+	}
+	
 	public static Value p(State state, Value obj) {
 		return n_p(state.nativeObject(), obj);
 	}
 	
-	public static String sym2name(State state, Symbol sym) {
-		return n_sym2name(state.nativeObject(), sym.nativeObject());
+	public static Symbol toId(State state, Value name) {
+		return new Symbol(n_toId(state.nativeObject(), name));
+	}
+	
+	public static int objEqual(State state, Value left, Value right) {
+		return n_objEqual(state.nativeObject(), left, right);
+	}
+	
+	public static int equal(State state, Value left, Value right) {
+		return n_equal(state.nativeObject(), left, right);
+	}
+	
+	public static Value Integer(State state, Value val) {
+		return n_Integer(state.nativeObject(), val);
+	}
+	
+	public static Value Float(State state, Value val) {
+		return n_Float(state.nativeObject(), val);
+	}
+	
+	public static Value inspect(State state, Value obj) {
+		return n_inspect(state.nativeObject(), obj);
+	}
+	
+	public static int eql(State state, Value left, Value right) {
+		return n_eql(state.nativeObject(), left, right);
+	}
+	
+	public static Value checkConvertType(State state, Value val, int type, String tname, String method) {
+		return n_checkConvertType(state.nativeObject(), val, type, tname, method);
+	}
+	
+	public static Value anyToS(State state, Value value) {
+		return n_anyToS(state.nativeObject(), value);
+	}
+	
+	public static String objClassname(State state, Value obj) {
+		return n_objClassname(state.nativeObject(), obj);
+	}
+	
+	public static RClass objClass(State state, Value obj) {
+		return new RClass(n_objClass(state.nativeObject(), obj));
+	}
+	
+	public static Value classPath(State state, RClass cls) {
+		return n_classPath(state.nativeObject(), cls.nativeObject());
+	}
+	
+	public static Value convertType(State state, Value val, int type, String tname, String method) {
+		return n_convertType(state.nativeObject(), val, type, tname, method);
+	}
+	
+	public static boolean objIsKindOf(State state, Value obj, RClass c) {
+		// for avoiding a error trapping inside 'mruby'.
+		switch (c.valueType()) {
+		case MRB_TT_MODULE:
+		case MRB_TT_CLASS:
+		case MRB_TT_ICLASS:
+			break;
+		default:
+			throw new IllegalArgumentException("'c' is not a type of class object.");
+		}
+		final int ret = n_objIsKindOf(state.nativeObject(), obj, c.nativeObject());
+		return 0 != ret ? true : false;
+	}
+	
+	public static Value objInspect(State state, Value self) {
+		return n_objInspect(state.nativeObject(), self);
+	}
+	
+	public static Value objClone(State state, Value self) {
+		return n_objClone(state.nativeObject(), self);
+	}
+	
+	public static int blockGivenP() {
+		return n_blockGivenP();
+	}
+	
+	public static void raise(State state, RClass c, String message) {
+		// 'mrb_raise' function call 'longjmp' method inside native code.
+		// so, inhibit this method call to avoid calling a method 'longjmp'.
+		throw new UnsupportedImplementationException("'raise' is not supported in this version.");
+		//n_raise(state.nativeObject(), c.nativeObject(), message);
+	}
+	
+	public static void warn(String format, Object... args) {
+		n_warn(String.format(format, args));
+	}
+	
+	public static void bug(String format, Object... args) {
+		n_bug(String.format(format, args));
+	}
+	
+	public static Value yield(State state, Value v, Value blk) {
+		return n_yield(state.nativeObject(), v, blk);
+	}
+	
+	public static Value yieldArgv(State state, Value b, int argc, Value[] argv) {
+		return n_yieldArgv(state.nativeObject(), b, argc, argv);
+	}
+	
+	public static Value yieldWithSelf(State state, Value b, int argc, Value[] argv, Value self) {
+		return n_yieldWithSelf(state.nativeObject(), b, argc, argv, self);
+	}
+	
+	public static Value classNewInstance(State state, int argc, Value[] argv, RClass c) {
+		return n_classNewInstance(state.nativeObject(), argc, argv, c.nativeObject());
+	}
+	
+	public static Value classNewInstanceM(State state, Value c) {
+		return n_classNewInstanceM(state.nativeObject(), c);
+	}
+	
+	public static void defineAlias(State state, RClass c, String name1, String name2) {
+		n_defineAlias(state.nativeObject(), c.nativeObject(), name1, name2);
+	}
+	
+	public static String className(State state, RClass c) {
+		return n_className(state.nativeObject(), c.nativeObject());
+	}
+	
+	public static void defineGlobalConst(State state, String name, Value value) {
+		n_defineGlobalConst(state.nativeObject(), name, value);
 	}
 	
 	public static synchronized InputStream stdout() throws IOException {
@@ -194,36 +412,33 @@ public class MRuby {
 	private static native Value n_p(long mrb, Value obj);
 	private static native long n_toId(long mrb, Value name);
 	
-	private static native int n_obj_equal(long mrb, Value left, Value right);
+	private static native int n_objEqual(long mrb, Value left, Value right);
 	private static native int n_equal(long mrb, Value left, Value right);
 	private static native Value n_Integer(long mrb, Value val);
 	private static native Value n_Float(long mrb, Value val);
 	private static native Value n_inspect(long mrb, Value obj);
 	private static native int n_eql(long mrb, Value left, Value right);
 	
-	private static native Value n_check_convert_type(long mrb, Value val, int type, String tname, String method);
+	private static native Value n_checkConvertType(long mrb, Value val, int type, String tname, String method);
 	private static native Value n_anyToS(long mrb, Value value);
 	private static native String n_objClassname(long mrb, Value obj);
 	private static native long n_objClass(long mrb, Value obj);
 	private static native Value n_classPath(long mrb, long cls);
-	private static native Value n_convert_type(long mrb, Value val, int type, String tname, String method);
-	private static native int n_obj_is_kind_of(long mrb, Value obj, long c);
+	private static native Value n_convertType(long mrb, Value val, int type, String tname, String method);
+	private static native int n_objIsKindOf(long mrb, Value obj, long c);
 	private static native Value n_objInspect(long mrb, Value self);
 	private static native Value n_objClone(long mrb, Value self);
-	private static native Value n_check_funcall(long mrb, Value recv, long mid, int argc, Value[] argv);
 	
-	private static native int n_block_given_p();
+	private static native int n_blockGivenP();
 	private static native void n_raise(long mrb, long c, String message);
-	private static native void n_rb_raise(long c, String message);
 	private static native void n_warn(String message);
-	private static native void n_warning(String message);
 	private static native void n_bug(String message);
 	
 	private static native Value n_yield(long mrb, Value v, Value blk);
-	private static native Value n_yield_argv(long mrb, Value b, int argc, Value[] argv);
-	private static native Value n_yield_with_self(long mrb, Value b, int argc, Value[] argv, Value self);
-	private static native Value n_class_new_instance(long mrb, int argc, Value[] argv, long c);
-	private static native Value n_class_new_instance_m(long mrb, Value c);
+	private static native Value n_yieldArgv(long mrb, Value b, int argc, Value[] argv);
+	private static native Value n_yieldWithSelf(long mrb, Value b, int argc, Value[] argv, Value self);
+	private static native Value n_classNewInstance(long mrb, int argc, Value[] argv, long c);
+	private static native Value n_classNewInstanceM(long mrb, Value c);
 	
 	private static native void n_defineAlias(long mrb, long c, String name1, String name2);
 	private static native String n_className(long mrb, long c);
