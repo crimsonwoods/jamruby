@@ -48,6 +48,9 @@ public class Value {
 		case MRB_TT_STRING:
 			this.obj = new RString(obj);
 			break;
+		case MRB_TT_HASH:
+			this.obj = new RHash(obj);
+			break;
 		default:
 			throw new NotImplementedException(String.format("Unknown value type (%s).", type.toString()));
 		}
@@ -169,13 +172,17 @@ public class Value {
 				builder.append(MRuby.objClassname(state, new Value(obj)));
 			}
 			break;
+		case MRB_TT_HASH:
+			if (null != state) {
+				// TODO enumerate all entries.
+			}
+			break;
 		case MRB_TT_PROC:
 		case MRB_TT_DATA:
 		case MRB_TT_ENV:
 		case MRB_TT_EXCEPTION:
 		case MRB_TT_FILE:
 		case MRB_TT_FREE:
-		case MRB_TT_HASH:
 		case MRB_TT_MATCH:
 		case MRB_TT_MAXDEFINE:
 		case MRB_TT_RANGE:
