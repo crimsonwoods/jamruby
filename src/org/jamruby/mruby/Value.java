@@ -43,6 +43,7 @@ public class Value {
 		case MRB_TT_MODULE:
 		case MRB_TT_CLASS:
 		case MRB_TT_ICLASS:
+		case MRB_TT_SCLASS:
 			this.obj = new RClass(obj);
 			break;
 		case MRB_TT_STRING:
@@ -50,6 +51,9 @@ public class Value {
 			break;
 		case MRB_TT_HASH:
 			this.obj = new RHash(obj);
+			break;
+		case MRB_TT_DATA:
+			this.obj = new RData(obj);
 			break;
 		default:
 			throw new NotImplementedException(String.format("Unknown value type (%s).", type.toString()));
@@ -158,6 +162,7 @@ public class Value {
 		case MRB_TT_CLASS:
 		case MRB_TT_MODULE:
 		case MRB_TT_ICLASS:
+		case MRB_TT_SCLASS:
 			if (null != state) {
 				builder.append(MRuby.className(state, (RClass)obj));
 			}
@@ -187,7 +192,6 @@ public class Value {
 		case MRB_TT_MAXDEFINE:
 		case MRB_TT_RANGE:
 		case MRB_TT_REGEX:
-		case MRB_TT_SCLASS:
 		case MRB_TT_STRUCT:
 		case MRB_TT_THREAD:
 		case MRB_TT_THREADGRP:
