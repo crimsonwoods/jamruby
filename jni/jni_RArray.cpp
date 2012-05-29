@@ -7,10 +7,7 @@ extern "C" {
 
 #include "safe_jni.hpp"
 #include "jni_type_conversion.h"
-
-static inline RArray *to_ptr(jlong array) {
-	return reinterpret_cast<RArray*>(static_cast<intptr_t>(array));
-}
+#include "jni_common.hpp"
 
 /*
  * Class:     org_jamruby_mruby_RArray
@@ -20,7 +17,7 @@ static inline RArray *to_ptr(jlong array) {
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getLen
   (JNIEnv *env, jclass clazz, jlong array)
 {
-	return to_ptr(array)->len;
+	return to_ptr<RArray>(array)->len;
 }
 
 /*
@@ -31,7 +28,7 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getLen
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getCapa
   (JNIEnv *env, jclass clazz, jlong array)
 {
-	return to_ptr(array)->capa;
+	return to_ptr<RArray>(array)->capa;
 }
 
 /*
@@ -42,8 +39,8 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getCapa
 JNIEXPORT jobjectArray JNICALL Java_org_jamruby_mruby_RArray_n_1getBuf
   (JNIEnv *env, jclass clazz, jlong array)
 {
-	size_t const len = to_ptr(array)->len;
-	mrb_value const * const values = to_ptr(array)->buf;
+	size_t const len = to_ptr<RArray>(array)->len;
+	mrb_value const * const values = to_ptr<RArray>(array)->buf;
 
 	if (NULL == values) {
 		return NULL;

@@ -1,10 +1,7 @@
 #include "jni_RBasic.h"
+#include "jni_common.hpp"
 extern "C" {
 #include "mruby.h"
-}
-
-inline static RBasic *to_ptr(jlong basic) {
-	return reinterpret_cast<RBasic*>(static_cast<intptr_t>(basic));
 }
 
 /*
@@ -15,7 +12,10 @@ inline static RBasic *to_ptr(jlong basic) {
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getValueType
   (JNIEnv *env, jclass clazz, jlong basic)
 {
-	RBasic *rbasic = to_ptr(basic);
+	RBasic const * const rbasic = to_ptr<RBasic>(basic);
+	if (NULL == rbasic) {
+		return -1;
+	}
 	return static_cast<jint>(rbasic->tt);
 }
 
@@ -27,7 +27,10 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getValueType
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getColor
   (JNIEnv *env, jclass clazz, jlong basic)
 {
-	RBasic *rbasic = to_ptr(basic);
+	RBasic const * const rbasic = to_ptr<RBasic>(basic);
+	if (NULL == rbasic) {
+		return -1;
+	}
 	return static_cast<jint>(rbasic->color);
 }
 
@@ -39,7 +42,10 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getColor
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getFlags
   (JNIEnv *env, jclass clazz, jlong basic)
 {
-	RBasic *rbasic = to_ptr(basic);
+	RBasic const * const rbasic = to_ptr<RBasic>(basic);
+	if (NULL == rbasic) {
+		return 0;
+	}
 	return static_cast<jint>(rbasic->flags);
 }
 
@@ -51,8 +57,11 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RBasic_n_1getFlags
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RBasic_n_1getRClass
   (JNIEnv *env, jclass clazz, jlong basic)
 {
-	RBasic *rbasic = to_ptr(basic);
-	return static_cast<jlong>(reinterpret_cast<intptr_t>(rbasic->c));
+	RBasic const * const rbasic = to_ptr<RBasic>(basic);
+	if (NULL == rbasic) {
+		return to_jlong(NULL);
+	}
+	return to_jlong(rbasic->c);
 }
 
 /*
@@ -63,8 +72,11 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RBasic_n_1getRClass
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RBasic_n_1getGCNext
   (JNIEnv *env, jclass clazz, jlong basic)
 {
-	RBasic *rbasic = to_ptr(basic);
-	return static_cast<jlong>(reinterpret_cast<intptr_t>(rbasic->gcnext));
+	RBasic const * const rbasic = to_ptr<RBasic>(basic);
+	if (NULL == rbasic) {
+		return to_jlong(NULL);
+	}
+	return to_jlong(rbasic->gcnext);
 }
 
 

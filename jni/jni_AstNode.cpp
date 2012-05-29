@@ -5,10 +5,7 @@ extern "C" {
 }
 
 #include "safe_jni.hpp"
-
-inline static mrb_ast_node *to_ptr(jlong ptr) {
-	return reinterpret_cast<mrb_ast_node*>(static_cast<intptr_t>(ptr));
-}
+#include "jni_common.hpp"
 
 /*
  * Class:     org_jamruby_mruby_AstNode
@@ -18,7 +15,11 @@ inline static mrb_ast_node *to_ptr(jlong ptr) {
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_AstNode_n_1getNodeType
   (JNIEnv *env, jclass clazz, jlong ptr)
 {
-	return static_cast<jint>(reinterpret_cast<intptr_t>(to_ptr(ptr)->car));
+	mrb_ast_node * const node = to_ptr<mrb_ast_node>(ptr);
+	if (NULL == node) {
+		return -1;
+	}
+	return static_cast<jint>(reinterpret_cast<intptr_t>(node->car));
 }
 
 /*
@@ -29,7 +30,8 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_AstNode_n_1getNodeType
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_AstNode_n_1getCar
   (JNIEnv *env, jclass clazz, jlong ptr)
 {
-	return static_cast<jlong>(reinterpret_cast<intptr_t>(to_ptr(ptr)->car)); 
+	mrb_ast_node * const node = to_ptr<mrb_ast_node>(ptr);
+	return to_jlong(node->car); 
 }
 
 /*
@@ -40,6 +42,10 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_AstNode_n_1getCar
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_AstNode_n_1getCdr
   (JNIEnv *env, jclass clazz, jlong ptr)
 {
-	return static_cast<jlong>(reinterpret_cast<intptr_t>(to_ptr(ptr)->cdr));
+	mrb_ast_node * const node = to_ptr<mrb_ast_node>(ptr);
+	if (NULL == node) {
+		return to_jlong(NULL);
+	}
+	return to_jlong(node->cdr);
 }
 

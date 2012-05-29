@@ -7,6 +7,7 @@ import org.jamruby.exception.ParseException;
 import org.jamruby.mruby.AstNode;
 import org.jamruby.mruby.MRuby;
 import org.jamruby.mruby.ParserState;
+import org.jamruby.mruby.Pointer;
 import org.jamruby.mruby.Pool;
 import org.jamruby.mruby.RObject;
 import org.jamruby.mruby.State;
@@ -16,7 +17,7 @@ import org.jamruby.mruby.Value;
 public class Jamruby {
 	private State state;
 	
-	public static final long UNAVAILABLE_NATIVE_OBJECT = 0;
+	public static final long UNAVAILABLE_NATIVE_OBJECT = Pointer.NATIVE_NULL_POINTER;
 	
 	public Jamruby() {
 		state = MRuby.open();
@@ -50,7 +51,20 @@ public class Jamruby {
 		return run(n, args);
 	}
 	
-	private int generateCode(ParserState p) {
+	public Value run(ParserState p, String...args) {
+		int n= generateCode(p);
+		return run(n, args);
+	}
+	
+	public ParserState parse(String command) {
+		return validateParserState(MRuby.parse(state, command));
+	}
+	
+	public ParserState parse(File f) throws IOException {
+		return validateParserState(MRuby.parse(state, f));
+	}
+	
+	private synchronized ParserState validateParserState(ParserState p) {
 		if (null == p) {
 			throw new ParseException();
 		}
@@ -58,6 +72,11 @@ public class Jamruby {
 		if (!node.available() || 0 != p.nerr()) {
 			throw new ParseException();
 		}
+		return p;
+	}
+	
+	private int generateCode(ParserState p) {
+		validateParserState(p);
 		final int n = MRuby.generateCode(state, p.tree());
 		final Pool pool = p.pool();
 		pool.close();

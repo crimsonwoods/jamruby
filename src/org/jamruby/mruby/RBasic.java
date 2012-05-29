@@ -10,15 +10,23 @@ public class RBasic {
 	}
 	
 	public ValueType valueType() {
-		return ValueType.valueOf(n_getValueType(nativeObj));
+		return ValueType.valueOf(n_getValueType(nativeObject()));
 	}
 	
 	public int color() {
-		return n_getColor(nativeObj);
+		return n_getColor(nativeObject());
 	}
 	
 	public int flags() {
-		return n_getFlags(nativeObj);
+		return n_getFlags(nativeObject());
+	}
+	
+	public RClass rclass() {
+		return new RClass(n_getRClass(nativeObject()));
+	}
+	
+	public RBasic gcNext() {
+		return new RBasic(n_getGCNext(nativeObject()));
 	}
 	
 	public synchronized long nativeObject() {

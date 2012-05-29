@@ -1,6 +1,6 @@
 package org.jamruby.mruby;
 
-public class REnv extends RObject {
+public class REnv extends RBasic {
 	public REnv(long ptr) {
 		super(ptr);
 	}
@@ -9,8 +9,8 @@ public class REnv extends RObject {
 		return n_getCioff(nativeObject());
 	}
 	
-	public long mid() {
-		return n_getMid(nativeObject());
+	public Symbol mid() {
+		return new Symbol(n_getMid(nativeObject()));
 	}
 	
 	private static native long n_getMid(long ptr);

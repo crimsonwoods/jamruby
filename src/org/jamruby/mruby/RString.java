@@ -1,6 +1,6 @@
 package org.jamruby.mruby;
 
-public class RString extends RObject {
+public class RString extends RBasic {
 	public RString(long ptr) {
 		super(ptr);
 	}

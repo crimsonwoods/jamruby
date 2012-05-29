@@ -1,10 +1,7 @@
 #include "jni_GC.h"
+#include "jni_common.hpp"
 extern "C" {
 #include "mruby.h"
-}
-
-template <typename T> inline T* to_ptr(jlong const handle) {
-	return reinterpret_cast<T* const>(static_cast<intptr_t const>(handle));
 }
 
 /*

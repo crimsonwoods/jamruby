@@ -2,6 +2,7 @@
 #include "jni_Log.h"
 #include "safe_jni.hpp"
 #include "jni_type_conversion.h"
+#include "jni_common.hpp"
 extern "C" {
 #include "mruby.h"
 #include "mruby/dump.h"
@@ -17,14 +18,6 @@ static mrb_value *create_mrb_value_array(JNIEnv *env, int const &argc, jobjectAr
 static inline void throw_exception(JNIEnv *env, char const *name, char const *message);
 
 #define MRBSTATE(mrb) to_ptr<mrb_state>(mrb)
-
-template <typename T> static inline T* to_ptr(jlong &handle) {
-	return reinterpret_cast<T*>(static_cast<intptr_t>(handle));
-}
-
-static inline jlong to_jlong(void *ptr) {
-	return static_cast<jlong>(reinterpret_cast<intptr_t>(ptr));
-}
 
 static inline mrb_sym to_sym(jlong &sym) {
 	return static_cast<mrb_sym>(sym);
@@ -382,7 +375,7 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1moduleNew
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1classFromSym
   (JNIEnv *, jclass, jlong mrb, jlong c, jlong name)
 {
-	RClass *cls = mrb_class_from_sym(MRBSTATE(mrb), to_ptr<RClass>(c), static_cast<mrb_sym>(name));
+	RClass *cls = mrb_class_from_sym(MRBSTATE(mrb), to_ptr<RClass>(c), to_sym(name));
 	return to_jlong(cls);
 }
 
@@ -455,7 +448,7 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1checkToInteger
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1objRespondTo
   (JNIEnv *env, jclass, jlong c, jlong mid)
 {
-	return mrb_obj_respond_to(to_ptr<RClass>(c), static_cast<mrb_sym>(mid));
+	return mrb_obj_respond_to(to_ptr<RClass>(c), to_sym(mid));
 }
 
 /*

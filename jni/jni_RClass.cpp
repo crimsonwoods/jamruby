@@ -1,4 +1,5 @@
 #include "jni_RClass.h"
+#include "jni_common.hpp"
 extern "C" {
 #include "mruby.h"
 #include "mruby/class.h"
@@ -12,7 +13,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RClass_n_1getSuperClass
   (JNIEnv *env, jclass clazz, jlong cls)
 {
-	RClass *rcls = reinterpret_cast<RClass*>(static_cast<intptr_t>(cls));
-	return static_cast<jlong>(reinterpret_cast<intptr_t>(rcls->super));
+	RClass const * const rcls = to_ptr<RClass>(cls);
+	return to_jlong(rcls->super);
 }
 

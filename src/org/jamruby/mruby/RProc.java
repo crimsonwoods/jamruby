@@ -1,6 +1,6 @@
 package org.jamruby.mruby;
 
-public class RProc extends RObject {
+public class RProc extends RBasic {
 	public RProc(long ptr) {
 		super(ptr);
 	}

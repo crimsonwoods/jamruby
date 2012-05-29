@@ -42,6 +42,7 @@ public class Value {
 			break;
 		case MRB_TT_MODULE:
 		case MRB_TT_CLASS:
+		case MRB_TT_ICLASS:
 			this.obj = new RClass(obj);
 			break;
 		case MRB_TT_STRING:
@@ -151,25 +152,32 @@ public class Value {
 				builder.append("null");
 			}
 			break;
+		case MRB_TT_CLASS:
+		case MRB_TT_MODULE:
+		case MRB_TT_ICLASS:
+			if (null != state) {
+				builder.append(MRuby.className(state, (RClass)obj));
+			}
+			break;
 		case MRB_TT_SYMBOL:
 			if (null != state) {
 				builder.append(MRuby.sym2name(state, sym));
-				break;
 			}
-			// fall-through
-		case MRB_TT_CLASS:
+			break;
+		case MRB_TT_OBJECT:
+			if (null != state) {
+				builder.append(MRuby.objClassname(state, new Value(obj)));
+			}
+			break;
+		case MRB_TT_PROC:
 		case MRB_TT_DATA:
 		case MRB_TT_ENV:
 		case MRB_TT_EXCEPTION:
 		case MRB_TT_FILE:
 		case MRB_TT_FREE:
 		case MRB_TT_HASH:
-		case MRB_TT_ICLASS:
 		case MRB_TT_MATCH:
 		case MRB_TT_MAXDEFINE:
-		case MRB_TT_MODULE:
-		case MRB_TT_OBJECT:
-		case MRB_TT_PROC:
 		case MRB_TT_RANGE:
 		case MRB_TT_REGEX:
 		case MRB_TT_SCLASS:
