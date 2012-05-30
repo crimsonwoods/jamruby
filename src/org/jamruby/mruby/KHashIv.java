@@ -20,6 +20,7 @@ public class KHashIv extends KHash<Long, Value> {
 
 	@Override
 	public void put(Long key, Value val) {
+		put((long)key, val);
 	}
 
 	@Override

@@ -179,7 +179,7 @@ public class Value {
 			break;
 		case MRB_TT_HASH:
 			if (null != state) {
-				// TODO enumerate all entries.
+				// TODO enumerate all entries if enumeration is supported inside 'mruby'.
 			}
 			break;
 		case MRB_TT_PROC:
