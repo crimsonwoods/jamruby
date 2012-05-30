@@ -1,7 +1,7 @@
 #include "jni_KHIvIterator.h"
 #include "jni_common.hpp"
 #include "safe_jni.hpp"
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 extern "C" {
 #include "mruby.h"
 #include "mruby/khash.h"

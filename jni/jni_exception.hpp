@@ -1,6 +1,7 @@
 #ifndef JNI_EXCEPTION_H
 #define JNI_EXCEPTION_H
 
+#include <jni.h>
 #include <exception>
 #include <string>
 
@@ -93,5 +94,7 @@ public:
 };
 
 }
+
+extern void throw_exception(JNIEnv *env, char const *name, char const *message);
 
 #endif

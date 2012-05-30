@@ -1,7 +1,7 @@
 #include "jni_MRuby.h"
 #include "jni_Log.h"
 #include "safe_jni.hpp"
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 #include "jni_common.hpp"
 extern "C" {
 #include "mruby.h"
@@ -13,9 +13,6 @@ extern "C" {
 #include <cstdio>
 #include <cerrno>
 #include <cstring>
-
-static mrb_value *create_mrb_value_array(JNIEnv *env, int const &argc, jobjectArray array);
-static inline void throw_exception(JNIEnv *env, char const *name, char const *message);
 
 #define MRBSTATE(mrb) to_ptr<mrb_state>(mrb)
 
@@ -1207,37 +1204,5 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1defineGlobalConst
 		return;
 	}
 	mrb_define_global_const(MRBSTATE(mrb), vname.string(), val);
-}
-
-static mrb_value *create_mrb_value_array(JNIEnv *env, int const &argc, jobjectArray array)
-{
-	safe_jni::safe_object_array ar(env, array);
-	mrb_value *values = NULL;
-	try {
-		values = new mrb_value[argc];
-	} catch (std::bad_alloc &e) {
-	}
-	if (NULL == values) {
-		throw_exception(env, "java/lang/OutOfMemoryError", "insufficient memory.");
-		return NULL;
-	}
-
-	for (int i = 0; i < argc; ++i) {
-		safe_jni::safe_local_ref<jobject> arg(env, ar.get(i));
-		if (!create_mrb_value(env, arg.get(), values[i])) {
-			delete[] values;
-			return NULL;
-		}
-	}
-	return values;
-}
-
-static inline void throw_exception(JNIEnv *env, char const *name, char const *message)
-{
-	safe_jni::safe_local_ref<jclass> clazz(env, env->FindClass(name));
-	if (!clazz) {
-		return;
-	}
-	env->ThrowNew(clazz.get(), message);
 }
 

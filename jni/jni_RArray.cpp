@@ -6,7 +6,7 @@ extern "C" {
 #include <cstddef>
 
 #include "safe_jni.hpp"
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 #include "jni_common.hpp"
 
 /*

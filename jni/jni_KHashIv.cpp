@@ -1,6 +1,6 @@
 #include "jni_KHashIv.h"
 #include "safe_jni.hpp"
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 #include "jni_common.hpp"
 extern "C" {
 #include "mruby.h"

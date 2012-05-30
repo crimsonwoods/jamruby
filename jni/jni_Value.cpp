@@ -1,5 +1,5 @@
 #include "jni_Value.h"
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 extern "C" {
 #include "mruby.h"
 }

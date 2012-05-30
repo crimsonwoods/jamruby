@@ -1,6 +1,6 @@
 #include "jni_RObject.h"
 #include "jni_common.hpp"
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 #include "safe_jni.hpp"
 extern "C" {
 #include "mruby.h"

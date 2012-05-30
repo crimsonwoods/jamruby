@@ -1,4 +1,4 @@
-#include "jni_type_conversion.h"
+#include "jni_type_conversion.hpp"
 #include "safe_jni.hpp"
 #include "jni_Log.h"
 
@@ -177,5 +177,27 @@ jobject create_value(JNIEnv *env, mrb_value const &value) {
         break;
     }
     return v;
+}
+
+mrb_value *create_mrb_value_array(JNIEnv *env, int const &num, jobjectArray array) {
+	safe_jni::safe_object_array ar(env, array);
+	mrb_value *values = NULL;
+	try {
+		values = new mrb_value[num];
+	} catch (std::bad_alloc &e) {
+	}
+	if (NULL == values) {
+		throw_exception(env, "java/lang/OutOfMemoryError", "insufficient memory.");
+		return NULL;
+	}
+
+	for (int i = 0; i < num; ++i) {
+		safe_jni::safe_local_ref<jobject> arg(env, ar.get(i));
+		if (!create_mrb_value(env, arg.get(), values[i])) {
+			delete[] values;
+			return NULL;
+		}
+	}
+	return values;
 }
 
