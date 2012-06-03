@@ -123,6 +123,20 @@ public class Value {
 		return n_obj_id();
 	}
 	
+	public boolean isNil() {
+		return (type != ValueType.MRB_TT_FALSE) ? false :
+			(0 != i) ? false : true;
+	}
+	
+	public boolean isFalse() {
+		return (type != ValueType.MRB_TT_FALSE) ? false :
+			(1 != i) ? false : true;
+	}
+	
+	public boolean isTrue() {
+		return (type != ValueType.MRB_TT_TRUE) ? false : true;
+	}
+	
 	@Override
 	public String toString() {
 		return toString(null);
@@ -136,7 +150,14 @@ public class Value {
 			builder.append("True");
 			break;
 		case MRB_TT_FALSE:
-			builder.append("False");
+			switch (i) {
+			case 0:
+				builder.append("Nil");
+				break;
+			case 1:
+				builder.append("False");
+				break;
+			}
 			break;
 		case MRB_TT_FIXNUM:
 			builder.append(i);
@@ -182,9 +203,23 @@ public class Value {
 				// TODO enumerate all entries if enumeration is supported inside 'mruby'.
 			}
 			break;
-		case MRB_TT_PROC:
 		case MRB_TT_DATA:
+			final RData.RDataType t = ((RData)obj).dataType();
+			if (null != t) {
+				builder.append(t.name());
+			}
+			break;
+		case MRB_TT_PROC:
+			final REnv e = ((RProc)obj).env();
+			if (null != e && null != state) {
+				MRuby.sym2name(state, e.mid());
+			}
+			break;
 		case MRB_TT_ENV:
+			if (null != state) {
+				MRuby.sym2name(state, ((REnv)obj).mid());
+			}
+			break;
 		case MRB_TT_EXCEPTION:
 		case MRB_TT_FILE:
 		case MRB_TT_FREE:

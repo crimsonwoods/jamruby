@@ -183,7 +183,11 @@ public class MRuby {
 	}
 	
 	public static State open() {
-		return new State(n_open());
+		State s = new State(n_open());
+		if (s.available()) {
+			n_init_JNI_module(s.nativeObject(), Thread.currentThread().getId());
+		}
+		return s;
 	}
 	
 	public static int checkstack(State state, int size) {
@@ -443,6 +447,9 @@ public class MRuby {
 	private static native void n_defineAlias(long mrb, long c, String name1, String name2);
 	private static native String n_className(long mrb, long c);
 	private static native void n_defineGlobalConst(long mrb, String name, Value value);
+	
+	private static native void n_init_JNI_module(long mrb, long threadId);
+	static native void n_cleanup_JNI_module(long mrb, long threadId);
 	
 	static {
 		System.loadLibrary("jamruby");

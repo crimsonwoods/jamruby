@@ -28,7 +28,7 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getLen
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getCapa
   (JNIEnv *env, jclass clazz, jlong array)
 {
-	return to_ptr<RArray>(array)->capa;
+	return to_ptr<RArray>(array)->aux.capa;
 }
 
 /*

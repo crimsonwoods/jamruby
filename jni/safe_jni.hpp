@@ -146,6 +146,30 @@ public:
 	}
 };
 
+class clear_exception {
+private:
+	JNIEnv *env_;
+	bool do_clear_;
+
+	clear_exception(clear_exception const &);
+	clear_exception &operator = (clear_exception const &);
+public:
+	clear_exception(JNIEnv *env)
+		: env_(env), do_clear_(true) {
+	}
+	~clear_exception() {
+		if (do_clear_) {
+			env_->ExceptionClear();
+		}
+	}
+	void no_clear() {
+		do_clear_ = false;
+	}
+	void remark() {
+		do_clear_ = true;
+	}
+};
+
 }
 
 #endif // end of SAFE_JNI_H

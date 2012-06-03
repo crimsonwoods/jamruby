@@ -26,6 +26,7 @@ public class State {
 	public synchronized void close() {
 		if (Jamruby.UNAVAILABLE_NATIVE_OBJECT != nativeObj) {
 			n_close(nativeObj);
+			MRuby.n_cleanup_JNI_module(nativeObj, Thread.currentThread().getId());
 			nativeObj = Jamruby.UNAVAILABLE_NATIVE_OBJECT;
 		}
 	}

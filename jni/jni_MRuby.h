@@ -599,6 +599,22 @@ JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_MRuby_n_1className
 JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1defineGlobalConst
   (JNIEnv *, jclass, jlong, jstring, jobject);
 
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_init_JNI_module
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1init_1JNI_1module
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_jamruby_mruby_MRuby
+ * Method:    n_cleanup_JNI_module
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1cleanup_1JNI_1module
+  (JNIEnv *, jclass, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

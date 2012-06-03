@@ -41,35 +41,11 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashGet
 
 /*
  * Class:     org_jamruby_mruby_RHash
- * Method:    n_hashGetWithDef
- * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashGetWithDef
-  (JNIEnv *, jclass, jlong, jobject, jobject, jobject);
-
-/*
- * Class:     org_jamruby_mruby_RHash
  * Method:    n_hashDeleteKey
  * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
  */
 JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashDeleteKey
   (JNIEnv *, jclass, jlong, jobject, jobject);
-
-/*
- * Class:     org_jamruby_mruby_RHash
- * Method:    n_hash
- * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hash
-  (JNIEnv *, jclass, jlong, jobject);
-
-/*
- * Class:     org_jamruby_mruby_RHash
- * Method:    n_checkHashType
- * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1checkHashType
-  (JNIEnv *, jclass, jlong, jobject);
 
 #ifdef __cplusplus
 }
