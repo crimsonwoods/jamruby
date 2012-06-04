@@ -4,9 +4,12 @@
 extern "C" {
 #include "mruby/class.h"
 #include "mruby/data.h"
+#include "mruby/string.h"
 }
 #include <cstdlib>
 #include <cstring>
+
+#include "jamruby_JMethod.h"
 
 #define CLASS_NAME "JClass"
 
@@ -68,6 +71,40 @@ mrb_value jcls_to_s(mrb_state *mrb, mrb_value self)
 	return mrb_str_new2(mrb, data->name);
 }
 
+mrb_value jcls_get_method(mrb_state *mrb, mrb_value self)
+{
+	mrb_value name, signature;
+	int const argc = mrb_get_args(mrb, "SS", &name, &signature);
+	if (2 != argc) {
+		return mrb_nil_value();
+	}
+	jclass_data *data = static_cast<jclass_data*>(mrb_get_datatype(mrb, self, &jcls_type));
+	JNIEnv *env = data->env;
+	safe_jni::clear_exception ce(env);
+	jmethodID jmid = env->GetMethodID(data->gref_jclass, mrb_string_value_ptr(mrb, name), mrb_string_value_ptr(mrb, signature));
+	if (NULL == jmid) {
+		return mrb_nil_value();
+	}
+	return jmethod_make(mrb, env, jmid);
+}
+
+mrb_value jcls_get_static_method(mrb_state *mrb, mrb_value self)
+{
+	mrb_value name, signature;
+	int const argc = mrb_get_args(mrb, "SS", &name, &signature);
+	if (2 != argc) {
+		return mrb_nil_value();
+	}
+	jclass_data *data = static_cast<jclass_data*>(mrb_get_datatype(mrb, self, &jcls_type));
+	JNIEnv *env = data->env;
+	safe_jni::clear_exception ce(env);
+	jmethodID jmid = env->GetStaticMethodID(data->gref_jclass, mrb_string_value_ptr(mrb, name), mrb_string_value_ptr(mrb, signature));
+	if (NULL == jmid) {
+		return mrb_nil_value();
+	}
+	return jmethod_make(mrb, env, jmid);
+}
+
 mrb_value jcls_initialize(mrb_state *mrb, mrb_value self)
 {
 	return mrb_nil_value();
@@ -81,6 +118,8 @@ int jcls_init_class(mrb_state *mrb)
 		return -1;
 	}
 	MRB_SET_INSTANCE_TT(cls_jcls, MRB_TT_DATA);
+	mrb_define_method(mrb, cls_jcls, "get_method", jcls_get_method, ARGS_REQ(2));
+	mrb_define_method(mrb, cls_jcls, "get_static_method", jcls_get_static_method, ARGS_REQ(2));
 	mrb_define_method(mrb, cls_jcls, "call_static", jcls_call_static, ARGS_REQ(1));
 	mrb_define_method(mrb, cls_jcls, "to_s", jcls_to_s, ARGS_NONE());
 	mrb_define_method(mrb, cls_jcls, "initialize", jcls_initialize, ARGS_REQ(1));

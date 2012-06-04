@@ -19,6 +19,7 @@ extern "C" {
 
 #include "jamruby_JClass.h"
 #include "jamruby_JObject.h"
+#include "jamruby_JMethod.h"
 
 #define MRBSTATE(mrb) to_ptr<mrb_state>(mrb)
 
@@ -1261,6 +1262,10 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1init_1JNI_1module
 	}
 
 	if (0 != jcls_init_class(MRBSTATE(mrb))) {
+		// TODO error handling
+	}
+
+	if (0 != jmethod_init_class(MRBSTATE(mrb))) {
 		// TODO error handling
 	}
 }
