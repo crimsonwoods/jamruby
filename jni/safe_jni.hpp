@@ -9,7 +9,7 @@ namespace safe_jni {
 template <typename T> class safe_array {
 private:
 	JNIEnv *env_;
-	jarray const &array_;
+	jarray const array_;
 	T* ptr_;
 	size_t size_;
 	bool is_copy_;
@@ -64,7 +64,7 @@ public:
 class safe_object_array {
 private:
 	JNIEnv *env_;
-	jobjectArray const &array_;
+	jobjectArray const array_;
 	size_t size_;
 public:
 	safe_object_array(JNIEnv *env, jobjectArray array)
@@ -74,6 +74,9 @@ public:
 	~safe_object_array() {
 	}
 
+	jobjectArray get() const {
+		return array_;
+	}
 	jobject get(int const &index) const {
 		if ((index < 0) || (static_cast<size_t>(index) > size_)) {
 			throw safe_jni::index_out_of_bounds_exception("Index out of bounds.");
@@ -88,10 +91,10 @@ public:
 	}
 };
 
-template <typename T> class safe_local_ref {
+template <typename T=jobject> class safe_local_ref {
 private:
 	JNIEnv *env_;
-	T ref_;
+	T const ref_;
 public:
 	safe_local_ref(JNIEnv *env, T obj)
 		: env_(env), ref_(obj) {
@@ -122,7 +125,7 @@ public:
 class safe_string {
 private:
 	JNIEnv *env_;
-	jstring const &ref_;
+	jstring const ref_;
 	char const *string_;
 public:
 	safe_string(JNIEnv *env, jstring const &string)
