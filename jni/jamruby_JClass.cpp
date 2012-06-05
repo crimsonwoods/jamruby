@@ -9,8 +9,10 @@ extern "C" {
 #include <cstdlib>
 #include <cstring>
 
+#include "jamruby_JObject.h"
 #include "jamruby_JMethod.h"
 
+#define SUPER_CLASS_NAME "JObject"
 #define CLASS_NAME "JClass"
 
 struct jclass_data {
@@ -62,6 +64,42 @@ mrb_value jcls_make(mrb_state *mrb, JNIEnv *env, char const * const name)
 
 mrb_value jcls_call_static(mrb_state *mrb, mrb_value self)
 {
+	mrb_value jmthd;
+	int rb_argc;
+	mrb_value *rb_argv;
+	int const argc = mrb_get_args(mrb, "o*", &jmthd, &rb_argv, &rb_argc);
+	if (argc < 1) {
+		return mrb_nil_value();
+	}
+	if (mrb_type(jmthd) != MRB_TT_DATA) {
+		return mrb_nil_value();
+	}
+
+	jclass_data *data = static_cast<jclass_data*>(mrb_get_datatype(mrb, self, &jcls_type));
+	JNIEnv *env = data->env;
+
+	jmethodID jmid = jmethod_get_jmethodID(mrb, jmthd);
+	if (NULL == jmid) {
+		// 'jmthd' is not 'JMethod' object.
+		return mrb_nil_value();
+	}
+
+	jvalue *jvals = new jvalue[rb_argc];
+	for (int i = 0; i < rb_argc; ++i) {
+		// TODO convert 'Ruby' object to 'Java' object.
+		// TODO set argument.
+		jvals[i].l = NULL;
+	}
+	safe_jni::safe_local_ref<jobject> retval(env, env->CallStaticObjectMethodA(data->gref_jclass, jmid, jvals));
+	delete[] jvals;
+	jvals = NULL;
+
+	return !retval ? mrb_nil_value() : jobject_make(mrb, env, retval.get());
+}
+
+mrb_value jcls_call(mrb_state *mrb, mrb_value self)
+{
+	// TODO implement
 	return mrb_nil_value();
 }
 
@@ -105,6 +143,14 @@ mrb_value jcls_get_static_method(mrb_state *mrb, mrb_value self)
 	return jmethod_make(mrb, env, jmid);
 }
 
+mrb_value jcls_get_class_object(mrb_state *mrb, mrb_value self)
+{
+	jclass_data *data = static_cast<jclass_data*>(mrb_get_datatype(mrb, self, &jcls_type));
+	JNIEnv *env = data->env;
+	safe_jni::safe_local_ref<jclass> objCls(env, env->GetObjectClass(data->gref_jclass));
+	return jobject_make(mrb, env, objCls.get());
+}
+
 mrb_value jcls_initialize(mrb_state *mrb, mrb_value self)
 {
 	return mrb_nil_value();
@@ -112,7 +158,7 @@ mrb_value jcls_initialize(mrb_state *mrb, mrb_value self)
 
 int jcls_init_class(mrb_state *mrb)
 {
-	RClass *cls_jobj = mrb_class_get(mrb, "JObject");
+	RClass *cls_jobj = mrb_class_get(mrb, SUPER_CLASS_NAME);
 	RClass *cls_jcls = mrb_define_class(mrb, CLASS_NAME, cls_jobj);
 	if (NULL == cls_jcls) {
 		return -1;
@@ -120,7 +166,9 @@ int jcls_init_class(mrb_state *mrb)
 	MRB_SET_INSTANCE_TT(cls_jcls, MRB_TT_DATA);
 	mrb_define_method(mrb, cls_jcls, "get_method", jcls_get_method, ARGS_REQ(2));
 	mrb_define_method(mrb, cls_jcls, "get_static_method", jcls_get_static_method, ARGS_REQ(2));
+	mrb_define_method(mrb, cls_jcls, "get_class_object", jcls_get_class_object, ARGS_NONE());
 	mrb_define_method(mrb, cls_jcls, "call_static", jcls_call_static, ARGS_REQ(1));
+	mrb_define_method(mrb, cls_jcls, "call", jcls_call, ARGS_REQ(2));
 	mrb_define_method(mrb, cls_jcls, "to_s", jcls_to_s, ARGS_NONE());
 	mrb_define_method(mrb, cls_jcls, "initialize", jcls_initialize, ARGS_REQ(1));
 	return 0;
