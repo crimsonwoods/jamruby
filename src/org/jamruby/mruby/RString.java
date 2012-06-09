@@ -7,8 +7,8 @@ public class RString extends RBasic {
 	
 	@Override
 	public String toString() {
-		return n_getBuf(nativeObject());
+		return n_getPtr(nativeObject());
 	}
 	
-	private static native String n_getBuf(long str);
+	private static native String n_getPtr(long str);
 }

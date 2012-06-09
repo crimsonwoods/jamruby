@@ -33,14 +33,14 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_RArray_n_1getCapa
 
 /*
  * Class:     org_jamruby_mruby_RArray
- * Method:    n_getBuf
+ * Method:    n_getPtr
  * Signature: (J)[Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_jamruby_mruby_RArray_n_1getBuf
+JNIEXPORT jobjectArray JNICALL Java_org_jamruby_mruby_RArray_n_1getPtr
   (JNIEnv *env, jclass clazz, jlong array)
 {
 	size_t const len = to_ptr<RArray>(array)->len;
-	mrb_value const * const values = to_ptr<RArray>(array)->buf;
+	mrb_value const * const values = to_ptr<RArray>(array)->ptr;
 
 	if (NULL == values) {
 		return NULL;

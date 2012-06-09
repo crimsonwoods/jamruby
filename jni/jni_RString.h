@@ -9,10 +9,10 @@ extern "C" {
 #endif
 /*
  * Class:     org_jamruby_mruby_RString
- * Method:    n_getBuf
+ * Method:    n_getPtr
  * Signature: (J)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_RString_n_1getBuf
+JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_RString_n_1getPtr
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

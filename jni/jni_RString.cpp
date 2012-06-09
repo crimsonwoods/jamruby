@@ -12,13 +12,13 @@ inline static RString *to_ptr(jlong str) {
 
 /*
  * Class:     org_jamruby_mruby_RString
- * Method:    n_getBuf
+ * Method:    n_getPtr
  * Signature: (J)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_RString_n_1getBuf
+JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_RString_n_1getPtr
   (JNIEnv *env, jclass clazz, jlong str)
 {
-	safe_jni::safe_local_ref<jstring> jstr(env, env->NewStringUTF(to_ptr(str)->buf));
+	safe_jni::safe_local_ref<jstring> jstr(env, env->NewStringUTF(to_ptr(str)->ptr));
 	return jstr.get();
 }
 
