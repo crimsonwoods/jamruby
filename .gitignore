@@ -1,0 +1,8 @@
+# auto generated directories by Eclipse
+bin/
+gen/
+
+# generated directories by NDK build
+obj/
+libs/
+jni/mrblib/
