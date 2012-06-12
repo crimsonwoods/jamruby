@@ -24,8 +24,10 @@ public class Jamruby {
 	}
 	
 	public void close() {
-		state.close();
-		state = null;
+		if (null != state) {
+			state.close();
+			state = null;
+		}
 	}
 	
 	public State state() {
