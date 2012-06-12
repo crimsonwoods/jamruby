@@ -44,12 +44,44 @@ mrb_value jobject_make(mrb_state *mrb, JNIEnv *env, jobject obj)
 	return mrb_obj_value(Data_Wrap_Struct(mrb, c, &jobject_type, ptr));
 }
 
-mrb_value jobject_get_jclass(mrb_state *mrb, mrb_value self)
+bool jobject_is_jobject(mrb_state *mrb, mrb_value obj)
 {
-	return mrb_nil_value();
+	jobject_data *data = static_cast<jobject_data*>(mrb_get_datatype(mrb, obj, &jobject_type));
+	return NULL == data ? false : true;
 }
 
-mrb_value jobject_to_s(mrb_state *mrb, mrb_value self)
+jobject jobject_get_jobject(mrb_state *mrb, mrb_value obj)
+{
+	jobject_data *data = static_cast<jobject_data*>(mrb_get_datatype(mrb, obj, &jobject_type));
+	if (NULL == data) {
+		return NULL;
+	}
+	return data->gref_jobj;
+}
+
+static mrb_value jobject_jclass(mrb_state *mrb, mrb_value self)
+{
+	jobject_data *data = static_cast<jobject_data*>(mrb_get_datatype(mrb, self, &jobject_type));
+	JNIEnv *env = data->env;
+	safe_jni::safe_local_ref<jclass> cls(env, env->GetObjectClass(data->gref_jobj));
+	return jcls_make(mrb, env, cls.get());
+}
+
+static mrb_value jobject_class(mrb_state *mrb, mrb_value self)
+{
+	jobject_data *data = static_cast<jobject_data*>(mrb_get_datatype(mrb, self, &jobject_type));
+	JNIEnv *env = data->env;
+
+	safe_jni::safe_local_ref<jclass> cls(env, env->GetObjectClass(data->gref_jobj));
+	jmethodID jmid = env->GetMethodID(cls.get(), "getClass", "()Ljava/lang/Class;");
+	if (NULL == jmid) {
+		return mrb_nil_value();
+	}
+	safe_jni::safe_local_ref<jobject> cls_obj(env, env->CallObjectMethod(data->gref_jobj, jmid));
+	return jobject_make(mrb, env, cls_obj.get());
+}
+
+static mrb_value jobject_to_s(mrb_state *mrb, mrb_value self)
 {
 	jobject_data *data = static_cast<jobject_data*>(mrb_get_datatype(mrb, self, &jobject_type));
 	JNIEnv *env = data->env;
@@ -66,7 +98,7 @@ mrb_value jobject_to_s(mrb_state *mrb, mrb_value self)
 	return mrb_str_new2(mrb, str.string());
 }
 
-mrb_value jobject_initialize(mrb_state *mrb, mrb_value self)
+static mrb_value jobject_initialize(mrb_state *mrb, mrb_value self)
 {
 	return mrb_nil_value();
 }
@@ -78,7 +110,8 @@ int jobject_init_class(mrb_state *mrb)
 		return -1;
 	}
 	MRB_SET_INSTANCE_TT(cls_jobj, MRB_TT_DATA);
-	mrb_define_method(mrb, cls_jobj, "get_jclass", jobject_get_jclass, ARGS_NONE());
+	mrb_define_method(mrb, cls_jobj, "jclass",     jobject_jclass,     ARGS_NONE());
+	mrb_define_method(mrb, cls_jobj, "class",      jobject_class,      ARGS_NONE());
 	mrb_define_method(mrb, cls_jobj, "to_s",       jobject_to_s,       ARGS_NONE());
 	mrb_define_method(mrb, cls_jobj, "initialize", jobject_initialize, ARGS_REQ(1));
 	return 0;

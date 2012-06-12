@@ -6,11 +6,10 @@ extern "C" {
 #include "mruby.h"
 }
 
-mrb_value jobject_make(mrb_state *mrb, JNIEnv *env, jobject obj);
-mrb_value jobject_get_class(mrb_state *mrb, mrb_value self);
-mrb_value jobject_call(mrb_state *mrb, mrb_value self);
-mrb_value jobject_initialize(mrb_state *mrb, mrb_value self);
-int jobject_init_class(mrb_state *mrb);
+extern mrb_value jobject_make(mrb_state *mrb, JNIEnv *env, jobject obj);
+extern bool      jobject_is_jobject(mrb_state *mrb, mrb_value obj);
+extern jobject   jobject_get_jobject(mrb_state *mrb, mrb_value obj);
+extern int       jobject_init_class(mrb_state *mrb);
 
 #endif // end of JAMRUBY_JOBJECT_H
 
