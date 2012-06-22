@@ -5,9 +5,8 @@
 extern "C" {
 #include "mruby.h"
 #include "mruby/khash.h"
+#include "mruby/variable.h"
 }
-
-KHASH_MAP_INIT_INT(iv, mrb_value);
 
 typedef uint32_t kh_iv_key;
 

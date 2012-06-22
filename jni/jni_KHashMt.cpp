@@ -5,9 +5,8 @@
 extern "C" {
 #include "mruby.h"
 #include "mruby/khash.h"
+#include "mruby/proc.h"
 }
-
-KHASH_MAP_INIT_INT(mt, RProc*);
 
 typedef uint32_t kh_mt_key;
 
