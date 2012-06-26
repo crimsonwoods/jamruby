@@ -21,6 +21,9 @@ extern "C" {
 #include "jamruby_JObject.h"
 #include "jamruby_JMethod.h"
 #include "jamruby_JThrowable.h"
+#include "jamruby_Context.h"
+#include "jamruby_mruby_ext.h"
+#include "jamruby_mruby_utils.h"
 
 #define MRBSTATE(mrb) to_ptr<mrb_state>(mrb)
 
@@ -1214,17 +1217,16 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1defineGlobalConst
 	mrb_define_global_const(MRBSTATE(mrb), vname.string(), val);
 }
 
-typedef std::map<mrb_state *, JNIEnv *> mrb2env_t;
-static mrb2env_t mrb2env;
-
 static mrb_value java_find_class(mrb_state *mrb, mrb_value self)
 {
-	mrb2env_t::const_iterator it = mrb2env.find(mrb);
-	if (it == mrb2env.end()) {
-		LOGE("can not lookup 'JNIEnv'.");
+	using namespace org::jamruby;
+	jamruby_context *context = jamruby_context::find_context(mrb);
+	if (NULL == context) {
+		LOGE("cannot find jamruby context.");
 		return mrb_nil_value();
 	}
-	JNIEnv *env = (*it).second;
+
+	JNIEnv *env = context->get_jni_env();
 	if (NULL == env) {
 		LOGE("null environment.");
 		return mrb_nil_value();
@@ -1249,9 +1251,11 @@ static mrb_value java_find_class(mrb_state *mrb, mrb_value self)
 JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1init_1JNI_1module
   (JNIEnv *env, jclass, jlong mrb, jlong threadId)
 {
-	mrb2env_t::const_iterator it = mrb2env.find(MRBSTATE(mrb));
-	if (it == mrb2env.end()) {
-		mrb2env.insert(mrb2env_t::value_type(MRBSTATE(mrb), env));
+	using namespace org::jamruby;
+	jamruby_context *context = jamruby_context::register_context(MRBSTATE(mrb), env);
+	if (NULL == context) {
+		LOGE("cannot register jamruby context.");
+		return;
 	}
 
 	RClass *mod_jni = mrb_define_module(MRBSTATE(mrb), "JAVA");
@@ -1273,6 +1277,17 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1init_1JNI_1module
 	if (0 != jthrowable_init_class(MRBSTATE(mrb))) {
 		// TODO error handling
 	}
+
+	RClass *clsKern = mrb_class_obj_get(MRBSTATE(mrb), "Kernel");
+	if (NULL != clsKern)
+	{
+		RProc * const proc = replace_mrb_func(MRBSTATE(mrb), clsKern, "require", jamruby_kernel_require);
+		if (NULL != proc) {
+			mrb_gc_mark(MRBSTATE(mrb), reinterpret_cast<RBasic*>(proc));
+		} else {
+			mrb_define_module_function(MRBSTATE(mrb), clsKern, "require", jamruby_kernel_require, ARGS_REQ(1));
+		}
+	}
 }
 
 /*
@@ -1283,9 +1298,7 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1init_1JNI_1module
 JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1cleanup_1JNI_1module
   (JNIEnv *env, jclass, jlong mrb, jlong threadId)
 {
-	mrb2env_t::iterator it = mrb2env.find(MRBSTATE(mrb));
-	if (it != mrb2env.end()) {
-		mrb2env.erase(it);
-	}
+	using namespace org::jamruby;
+	jamruby_context::unregister_context(MRBSTATE(mrb));
 }
 
