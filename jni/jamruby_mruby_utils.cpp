@@ -10,6 +10,11 @@ char const *get_called_mrb_func_name(mrb_state *mrb)
 	return mrb_sym2name(mrb, mrb->ci->mid);
 }
 
+RClass *get_called_mrb_class(mrb_state *mrb)
+{
+	return mrb->ci->target_class;
+}
+
 RProc *replace_mrb_func(mrb_state *mrb, RClass *klass, char const * const name, mrb_func_t func)
 {
 	mrb_sym const mid = mrb_intern(mrb, name);
