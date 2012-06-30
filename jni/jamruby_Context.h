@@ -4,6 +4,7 @@
 #include <jni.h>
 #include "mruby.h"
 #include <map>
+#include <string>
 
 namespace org {
 namespace jamruby {
@@ -15,11 +16,12 @@ private:
 
 	jamruby_context(mrb_state *mrb, JNIEnv *env) : mrb_(mrb), env_(env) {
 	}
-	~jamruby_context() {
-	}
+	~jamruby_context();
 
 public:
 	typedef std::map<mrb_state*, jamruby_context*> map_type;
+	typedef std::map<mrb_sym, std::string>         signature_map_t;
+	typedef std::map<RClass*, signature_map_t*>    method_map_t;
 
 public:
 	static jamruby_context *register_context(mrb_state *mrb, JNIEnv *env) {
@@ -65,9 +67,18 @@ public:
 		return env_;
 	}
 
+	void register_method_signature(bool is_class_method, struct RClass *target,
+		char const * const name, char const * const sig);
+	void unregister_method_signature(bool is_class_method, struct RClass *target,
+		char const * const name);
+	std::string const &find_method_signature(bool is_class_method, struct RClass *target,
+		char const * const name);
+
 private:
 	mrb_state *mrb_;
 	JNIEnv    *env_;
+	method_map_t class_methods;
+	method_map_t instance_methods;
 
 	static map_type inner_map;
 };
