@@ -173,6 +173,271 @@ public:
 	}
 };
 
+template <typename Ret_> class method {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	Ret_ operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		jobject ret = env_->CallObjectMethodV(obj, mid_, args);
+		va_end(args);
+		return static_cast<Ret_>(ret);
+	}
+	Ret_ operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		jobject ret = env_->CallStaticObjectMethodV(cls, mid_, args);
+		va_end(args);
+		return static_cast<Ret_>(ret);
+	}
+};
+
+template <> class method<void> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	void operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		env_->CallVoidMethodV(obj, mid_, args);
+		va_end(args);
+	}
+	void operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		env_->CallStaticVoidMethodV(cls, mid_, args);
+		va_end(args);
+	}
+};
+
+template <> class method<int> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	int operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		int ret = env_->CallIntMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	int operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		int ret = env_->CallStaticIntMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<long> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	long operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		long ret = env_->CallLongMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	long operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		long ret = env_->CallStaticLongMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<float> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	float operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		float ret = env_->CallFloatMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	float operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		float ret = env_->CallStaticFloatMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<double> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	double operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		double ret = env_->CallDoubleMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	double operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		double ret = env_->CallStaticDoubleMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<bool> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	bool operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		jboolean ret = env_->CallBooleanMethodV(obj, mid_, args);
+		va_end(args);
+		return JNI_FALSE == ret ? false : true;
+	}
+	bool operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		jboolean ret = env_->CallStaticBooleanMethodV(cls, mid_, args);
+		va_end(args);
+		return JNI_FALSE == ret ? false : true;
+	}
+};
+
+
 }
 
 #endif // end of SAFE_JNI_H
