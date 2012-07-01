@@ -48,6 +48,6 @@ public class MethodSignature {
 	}
 	
 	private static String genSignature(String fqn) {
-		return fqn.replace('.', '/') + ";";
+		return "L" + fqn.replace('.', '/') + ";";
 	}
 }
