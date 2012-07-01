@@ -18,12 +18,12 @@ private:
 	}
 	~jamruby_context();
 
+	struct class_map_entry_t;
 public:
-	typedef std::map<mrb_state*, jamruby_context*> map_type;
-	typedef std::map<mrb_sym, std::string>         signature_map_t;
-	typedef std::map<RClass*, signature_map_t*>    method_map_t;
+	typedef std::map<mrb_state*, jamruby_context*>       map_type;
+	typedef std::map<mrb_sym, std::string>               signature_map_t;
+	typedef std::map<RClass*, class_map_entry_t*> class_map_t;
 
-public:
 	static jamruby_context *register_context(mrb_state *mrb, JNIEnv *env) {
 		map_type::const_iterator it = inner_map.find(mrb);
 		if (it != inner_map.end()) {
@@ -67,20 +67,44 @@ public:
 		return env_;
 	}
 
-	void register_method_signature(bool is_class_method, struct RClass *target,
+	bool register_method_signature(bool is_class_method, struct RClass *target,
 		char const * const name, char const * const sig);
 	void unregister_method_signature(bool is_class_method, struct RClass *target,
 		char const * const name);
 	std::string const &find_method_signature(bool is_class_method, struct RClass *target,
 		char const * const name);
 
+	bool register_jclass(struct RClass *target, jclass jcls);
+	jclass unregister_jclass(struct RClass *target);
+	jclass find_jclass(struct RClass *target);
+
 private:
 	mrb_state *mrb_;
 	JNIEnv    *env_;
-	method_map_t class_methods;
-	method_map_t instance_methods;
+	class_map_t classes;
 
 	static map_type inner_map;
+
+	struct class_map_entry_t {
+		jclass           jcls;
+		signature_map_t *class_methods;
+		signature_map_t *instance_methods;
+
+		class_map_entry_t() : jcls(NULL), class_methods(NULL), instance_methods(NULL) {}
+		~class_map_entry_t() {}
+	};
+
+	class destruct_class{
+	private:
+		JNIEnv *env_;
+	public:
+		destruct_class(JNIEnv *env) : env_(env) {}
+		destruct_class(destruct_class const &src) : env_(src.env_) {}
+		~destruct_class() {}
+		destruct_class &operator = (destruct_class const &src) { env_ = src.env_; return *this; }
+		void operator() (jamruby_context::class_map_t::value_type val);
+	};
+
 };
 
 };

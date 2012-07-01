@@ -1,4 +1,5 @@
 #include "jamruby_JMethod.h"
+#include "jamruby_jni_method_call.h"
 #include "safe_jni.hpp"
 #include "jni_Log.h"
 extern "C" {
@@ -71,65 +72,9 @@ jni_type_t jmethod_get_return_type(mrb_state *mrb, mrb_value obj)
 	char const * const sig = data->signature;
 	if (NULL == sig) {
 		LOGE("%s: Signature is null.", __func__);
-		return JNI_TYPE_UNKNOWN;
+		return jni_type_t();
 	}
-	char const *p = strchr(sig, ')');
-	if (NULL == p) {
-		LOGE("%s: Invalid signature format.", __func__);
-		return JNI_TYPE_UNKNOWN;
-	}
-
-	jni_type_t type = JNI_TYPE_UNKNOWN;
-	bool is_array = false;
-	do {
-		switch(*p++) {
-		case 'L':
-			LOGD("%s: JNI_TYPE_OBJECT", __func__);
-			type = JNI_TYPE_OBJECT;
-			break;
-		case 'V':
-			LOGD("%s: JNI_TYPE_VOID", __func__);
-			type = JNI_TYPE_VOID;
-			break;
-		case 'Z':
-			LOGD("%s: JNI_TYPE_BOOLEAN", __func__);
-			type = JNI_TYPE_BOOLEAN;
-			break;
-		case 'B':
-			LOGD("%s: JNI_TYPE_BYTE", __func__);
-			type = JNI_TYPE_BYTE;
-			break;
-		case 'C':
-			LOGD("%s: JNI_TYPE_CHAR", __func__);
-			type = JNI_TYPE_CHAR;
-			break;
-		case 'S':
-			LOGD("%s: JNI_TYPE_SHORT", __func__);
-			type = JNI_TYPE_SHORT;
-			break;
-		case 'I':
-			LOGD("%s: JNI_TYPE_INT", __func__);
-			type = JNI_TYPE_INT;
-			break;
-		case 'J':
-			LOGD("%s: JNI_TYPE_LONG", __func__);
-			type = JNI_TYPE_LONG;
-			break;
-		case 'F':
-			LOGD("%s: JNI_TYPE_FLOAT", __func__);
-			type = JNI_TYPE_FLOAT;
-			break;
-		case 'D':
-			LOGD("%s: JNI_TYPE_DOUBLE", __func__);
-			type = JNI_TYPE_DOUBLE;
-			break;
-		case '[':
-			is_array = true;
-			break;
-		}
-	} while(jni_type_get_type(type) == JNI_TYPE_UNKNOWN);
-
-	return jni_type_make(type, is_array);
+	return org::jamruby::get_return_type(sig);
 }
 
 bool jmethod_get_argument_types(mrb_state *mrb, mrb_value obj, jni_type_t *types, int num)
@@ -140,64 +85,7 @@ bool jmethod_get_argument_types(mrb_state *mrb, mrb_value obj, jni_type_t *types
 		LOGE("%s: Signature is null.", __func__);
 		return false;
 	}
-	char const *p = strchr(sig, '(');
-	if (NULL == p) {
-		LOGE("%s: Invalid signature format.", __func__);
-		return false;
-	}
-
-	for (int i = 0; i < num; ++i) {
-		jni_type_t type = JNI_TYPE_UNKNOWN;
-		bool is_array = false;
-		do {
-			switch(*p++) {
-			case 'L':
-				type = JNI_TYPE_OBJECT;
-				p = strchr(p, ';');
-				if (NULL == p) {
-					return false;
-				}
-				++p;
-				break;
-			case 'V':
-				type = JNI_TYPE_VOID;
-				break;
-			case 'Z':
-				type = JNI_TYPE_BOOLEAN;
-				break;
-			case 'B':
-				type = JNI_TYPE_BYTE;
-				break;
-			case 'C':
-				type = JNI_TYPE_CHAR;
-				break;
-			case 'S':
-				type = JNI_TYPE_SHORT;
-				break;
-			case 'I':
-				type = JNI_TYPE_INT;
-				break;
-			case 'J':
-				type = JNI_TYPE_LONG;
-				break;
-			case 'F':
-				type = JNI_TYPE_FLOAT;
-				break;
-			case 'D':
-				type = JNI_TYPE_DOUBLE;
-				break;
-			case '[':
-				is_array = true;
-				break;
-			case '\0':
-			case ')':
-				return false;
-			}
-		} while(jni_type_get_type(type) == JNI_TYPE_UNKNOWN);
-		types[i] = jni_type_make(type, is_array);
-	} 
-
-	return true;
+	return org::jamruby::get_argument_types(sig, types, num);
 }
 
 static mrb_value jmethod_initialize(mrb_state *mrb, mrb_value self)
