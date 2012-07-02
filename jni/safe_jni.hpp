@@ -247,7 +247,7 @@ public:
 	}
 };
 
-template <> class method<int> {
+template <> class method<int8_t> {
 private:
 	JNIEnv *env_;
 	jmethodID mid_;
@@ -269,23 +269,23 @@ public:
 	bool operator ! () const {
 		return !available();
 	}
-	int operator () (jobject obj, ...) const {
+	int8_t operator () (jobject obj, ...) const {
 		va_list args;
 		va_start(args, obj);
-		int ret = env_->CallIntMethodV(obj, mid_, args);
+		int8_t ret = env_->CallByteMethodV(obj, mid_, args);
 		va_end(args);
 		return ret;
 	}
-	int operator () (jclass cls, ...) const {
+	int8_t operator () (jclass cls, ...) const {
 		va_list args;
 		va_start(args, cls);
-		int ret = env_->CallStaticIntMethodV(cls, mid_, args);
+		int8_t ret = env_->CallStaticByteMethodV(cls, mid_, args);
 		va_end(args);
 		return ret;
 	}
 };
 
-template <> class method<long> {
+template <> class method<int16_t> {
 private:
 	JNIEnv *env_;
 	jmethodID mid_;
@@ -307,17 +307,131 @@ public:
 	bool operator ! () const {
 		return !available();
 	}
-	long operator () (jobject obj, ...) const {
+	int16_t operator () (jobject obj, ...) const {
 		va_list args;
 		va_start(args, obj);
-		long ret = env_->CallLongMethodV(obj, mid_, args);
+		int16_t ret = env_->CallShortMethodV(obj, mid_, args);
 		va_end(args);
 		return ret;
 	}
-	long operator () (jclass cls, ...) const {
+	int16_t operator () (jclass cls, ...) const {
 		va_list args;
 		va_start(args, cls);
-		long ret = env_->CallStaticLongMethodV(cls, mid_, args);
+		int16_t ret = env_->CallStaticShortMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<uint16_t> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	uint16_t operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		uint16_t ret = env_->CallCharMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	uint16_t operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		uint16_t ret = env_->CallStaticCharMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<int32_t> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	int32_t operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		int32_t ret = env_->CallIntMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	int32_t operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		int32_t ret = env_->CallStaticIntMethodV(cls, mid_, args);
+		va_end(args);
+		return ret;
+	}
+};
+
+template <> class method<int64_t> {
+private:
+	JNIEnv *env_;
+	jmethodID mid_;
+public:
+	method(JNIEnv *env, jobject obj, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		safe_local_ref<jclass> cls(env, env->GetObjectClass(obj));
+		mid_ = env->GetMethodID(cls.get(), name, sig);
+	}
+	method(JNIEnv *env, jclass cls, char const * const name, char const * const sig)
+		: env_(env), mid_(NULL) {
+		mid_ = env->GetStaticMethodID(cls, name, sig);
+	}
+	~method() {
+	}
+	bool available() const {
+		return NULL == mid_ ? false : true;
+	}
+	bool operator ! () const {
+		return !available();
+	}
+	int64_t operator () (jobject obj, ...) const {
+		va_list args;
+		va_start(args, obj);
+		int64_t ret = env_->CallLongMethodV(obj, mid_, args);
+		va_end(args);
+		return ret;
+	}
+	int64_t operator () (jclass cls, ...) const {
+		va_list args;
+		va_start(args, cls);
+		int64_t ret = env_->CallStaticLongMethodV(cls, mid_, args);
 		va_end(args);
 		return ret;
 	}
