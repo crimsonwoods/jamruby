@@ -5,9 +5,43 @@
 extern "C" {
 #include "mruby/string.h"
 }
+#include <map>
 
 namespace org {
 namespace jamruby {
+
+typedef mrb_value (*jvalue_to_mrb_value)(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+typedef std::map<std::string, jvalue_to_mrb_value> j2m_converter_map_t;
+static j2m_converter_map_t j2m_converters;
+
+static mrb_value Boolean_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Character_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Byte_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Short_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Integer_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Long_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Double_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Float_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value Object_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+static mrb_value String_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
+
+
+void init_converters()
+{
+	if (0 != j2m_converters.size()) {
+		return;
+	}
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Boolean",   Boolean_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Character", Character_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Byte",      Byte_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Short",     Short_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Integer",   Integer_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Long",      Long_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Double",    Double_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Float",     Float_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/Object",    Object_to_mrb));
+	j2m_converters.insert(j2m_converter_map_t::value_type("java/lang/String",    String_to_mrb));
+}
 
 bool convert_mrb_value_to_jvalue(mrb_state *mrb, JNIEnv *env, mrb_value rval, jvalue &jval, jni_type_t const &type)
 {
@@ -162,29 +196,18 @@ mrb_value convert_jvalue_to_mrb_value(mrb_state *mrb, JNIEnv *env, jni_type_t co
 #endif
 		case JNI_TYPE_OBJECT:
 		{
-			std::string const &name = type.name();
-			if (0 == name.compare("java/lang/String")) {
-				safe_jni::safe_string str(env, static_cast<jstring>(ret.l));
-				return mrb_str_new2(mrb, str.string());
-			} else if (0 == name.compare("java/lang/Integer") || 0 == name.compare("java/lang/Short") || 0 == name.compare("java/lang/Byte")) {
-				safe_jni::method<int> int_value(env, ret.l, "intValue", "()I");
-				return mrb_fixnum_value(int_value(ret.l));
-			} else if (0 == name.compare("java/lang/Boolean")) {
-				safe_jni::method<bool> boolean_value(env, ret.l, "booleanValue", "()Z");
-				return boolean_value(ret.l) ? mrb_true_value() : mrb_false_value();
-			} else if (0 == name.compare("java/lang/Float")) {
-				safe_jni::method<float> float_value(env, ret.l, "floatValue", "()F");
-				return mrb_float_value(float_value(ret.l));
-			} else if (0 == name.compare("java/lang/Double")) {
-				safe_jni::method<double> double_value(env, ret.l, "doubleValue", "()D");
-#ifdef MRB_USE_FLOAT
-				return mrb_float_value((float)double_value(ret.l));
-#else
-				return mrb_float_value(double_value(ret.l));
-#endif
+			if (NULL == ret.l) {
+				return mrb_nil_value();
 			}
-			safe_jni::safe_local_ref<jobject> retval(env, ret.l);
-			return (NULL == ret.l) ? mrb_nil_value() : jobject_make(mrb, env, retval.get());
+
+			std::string const &name = type.name();
+
+			j2m_converter_map_t::const_iterator it = j2m_converters.find(name);
+			if (it == j2m_converters.end()) {
+				return Object_to_mrb(mrb, env, ret.l, name);
+			} else {
+				return it->second(mrb, env, ret.l, name);
+			}
 		}
 		default:
 			return mrb_nil_value();
@@ -367,6 +390,71 @@ int get_count_of_arguments(char const * const signature)
 
 	return ret;
 }
+
+static mrb_value Boolean_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<bool> boolean_value(env, value, "booleanValue", "()Z");
+	return boolean_value(value) ? mrb_true_value() : mrb_false_value();
+}
+
+static mrb_value Character_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<uint16_t> char_value(env, value, "charValue", "()C");
+	return mrb_fixnum_value(char_value(value));
+}
+
+static mrb_value Byte_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<int8_t> int_value(env, value, "intValue", "()I");
+	return mrb_fixnum_value(int_value(value));
+}
+
+static mrb_value Short_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<int16_t> int_value(env, value, "intValue", "()I");
+	return mrb_fixnum_value(int_value(value));
+}
+
+static mrb_value Integer_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<int32_t> int_value(env, value, "intValue", "()I");
+	return mrb_fixnum_value(int_value(value));
+}
+
+static mrb_value Long_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	mrb_raise(mrb, E_RUNTIME_ERROR, "not implemented conversion fromn 'java/lang/Long' to mruby value.");
+	return mrb_nil_value();
+}
+
+static mrb_value Double_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<double> double_value(env, value, "doubleValue", "()D");
+#ifdef MRB_USE_FLOAT
+	return mrb_float_value((float)double_value(value));
+#else
+	return mrb_float_value(double_value(value));
+#endif
+}
+
+static mrb_value Float_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::method<float> float_value(env, value, "floatValue", "()F");
+	return mrb_float_value(float_value(value));
+}
+
+static mrb_value Object_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::safe_local_ref<jobject> retval(env, value);
+	return (NULL == value) ? mrb_nil_value() : jobject_make(mrb, env, retval.get());
+}
+
+static mrb_value String_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
+{
+	safe_jni::safe_string str(env, static_cast<jstring>(value));
+	return mrb_str_new2(mrb, str.string());
+}
+
 
 };
 };

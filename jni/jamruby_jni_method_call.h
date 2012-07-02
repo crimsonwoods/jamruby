@@ -62,6 +62,7 @@ template <typename JType> static jvalue call_method(mrb_state *mrb, JNIEnv *env,
 	return ret;
 }
 
+extern void       init_converters();
 extern bool       convert_mrb_value_to_jvalue(mrb_state *mrb, JNIEnv *env, mrb_value rval, jvalue &jval, jni_type_t const &type);
 extern mrb_value  convert_jvalue_to_mrb_value(mrb_state *mrb, JNIEnv *env, jni_type_t const &type, jvalue const &ret);
 extern jni_type_t get_return_type(char const * const signature);
