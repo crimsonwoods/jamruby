@@ -98,10 +98,6 @@ public class MRuby {
 		return new RClass(n_moduleNew(state.nativeObject()));
 	}
 	
-	public static RClass classFromSym(State state, RClass c, Symbol name) {
-		return new RClass(n_classFromSym(state.nativeObject(), c.nativeObject(), name.nativeObject()));
-	}
-	
 	public static RClass classGet(State state, String name) {
 		return new RClass(n_classGet(state.nativeObject(), name));
 	}
@@ -202,8 +198,8 @@ public class MRuby {
 		return n_run(state.nativeObject(), proc.nativeObject(), value);
 	}
 	
-	public static Value p(State state, Value obj) {
-		return n_p(state.nativeObject(), obj);
+	public static void p(State state, Value obj) {
+		n_p(state.nativeObject(), obj);
 	}
 	
 	public static Symbol toId(State state, Value name) {
@@ -307,10 +303,6 @@ public class MRuby {
 		return n_yieldArgv(state.nativeObject(), b, argc, argv);
 	}
 	
-	public static Value yieldWithSelf(State state, Value b, int argc, Value[] argv, Value self) {
-		return n_yieldWithSelf(state.nativeObject(), b, argc, argv, self);
-	}
-	
 	public static Value classNewInstance(State state, int argc, Value[] argv, RClass c) {
 		return n_classNewInstance(state.nativeObject(), argc, argv, c.nativeObject());
 	}
@@ -383,7 +375,6 @@ public class MRuby {
 	private static native Value n_instanceNew(long mrb, Value cv);
 	private static native long n_classNew(long mrb, long superClass);
 	private static native long n_moduleNew(long mrb);
-	private static native long n_classFromSym(long mrb, long c, long name);
 	private static native long n_classGet(long mrb, String name);
 	private static native long n_classObjGet(long mrb, String name);
 	
@@ -413,7 +404,7 @@ public class MRuby {
 	private static native Value n_topSelf(long mrb);
 	private static native Value n_run(long mrb, long proc, Value value);
 	
-	private static native Value n_p(long mrb, Value obj);
+	private static native void n_p(long mrb, Value obj);
 	private static native long n_toId(long mrb, Value name);
 	
 	private static native int n_objEqual(long mrb, Value left, Value right);
@@ -440,7 +431,6 @@ public class MRuby {
 	
 	private static native Value n_yield(long mrb, Value v, Value blk);
 	private static native Value n_yieldArgv(long mrb, Value b, int argc, Value[] argv);
-	private static native Value n_yieldWithSelf(long mrb, Value b, int argc, Value[] argv, Value self);
 	private static native Value n_classNewInstance(long mrb, int argc, Value[] argv, long c);
 	private static native Value n_classNewInstanceM(long mrb, Value c);
 	

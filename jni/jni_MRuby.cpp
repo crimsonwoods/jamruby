@@ -135,7 +135,14 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1parseString
 		}
 		strncpy(copy, command_line.string(), length);
 		copy[length] = '\0';
-		state = mrb_parse_string(MRBSTATE(mrb), copy);
+		mrbc_context *ctx = mrbc_context_new(MRBSTATE(mrb));
+		if (NULL == ctx) {
+			delete[] copy;
+			throw std::bad_alloc();
+		}
+		state = mrb_parse_string(MRBSTATE(mrb), copy, ctx);
+		mrbc_context_free(MRBSTATE(mrb), ctx);
+		delete[] copy;
 	} catch (std::bad_alloc &e) {
 		throw_exception(env, "java/lang/OutOfMemoryError", "Insufficient memory.");
 	}
@@ -157,9 +164,18 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1parseFile
 		if (NULL == fp) {
 			throw safe_jni::file_not_found_exception(strerror(errno));
 		}
-		state = mrb_parse_file(MRBSTATE(mrb), fp);
+		mrbc_context *ctx = mrbc_context_new(MRBSTATE(mrb));
+		if (NULL == ctx) {
+			fclose(fp);
+			throw new std::bad_alloc();
+		}
+		state = mrb_parse_file(MRBSTATE(mrb), fp, ctx);
+		mrbc_context_free(MRBSTATE(mrb), ctx);
+		fclose(fp);
 	} catch (safe_jni::exception &e) {
 		throw_exception(env, e.java_exception_name(), e.message());
+	} catch (std::bad_alloc& e) {
+		throw_exception(env, "java/lang/OutOfMemoryError", "Insufficient memory.");
 	}
 	return static_cast<jlong>(reinterpret_cast<intptr_t>(state));
 }
@@ -377,18 +393,6 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1moduleNew
 
 /*
  * Class:     org_jamruby_mruby_MRuby
- * Method:    n_classFromSym
- * Signature: (JJJ)J
- */
-JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1classFromSym
-  (JNIEnv *, jclass, jlong mrb, jlong c, jlong name)
-{
-	RClass *cls = mrb_class_from_sym(MRBSTATE(mrb), to_ptr<RClass>(c), to_sym(name));
-	return to_jlong(cls);
-}
-
-/*
- * Class:     org_jamruby_mruby_MRuby
  * Method:    n_classGet
  * Signature: (JLjava/lang/String;)J
  */
@@ -504,7 +508,7 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1funcall
 	}
 
 	safe_jni::safe_string func_name(env, name);
-	mrb_value const &ret = mrb_funcall_argv(MRBSTATE(mrb), self_val, func_name.string(), argc, values);
+	mrb_value const &ret = mrb_funcall_argv(MRBSTATE(mrb), self_val, mrb_intern(MRBSTATE(mrb), func_name.string()), argc, values);
 	delete[] values;
 	values = NULL;
 
@@ -535,7 +539,7 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1funcallWithBlock
 	}
 
 	safe_jni::safe_string func_name(env, name);
-	mrb_value const &ret = mrb_funcall_with_block(MRBSTATE(mrb), self_val, func_name.string(), argc, values, block_val);
+	mrb_value const &ret = mrb_funcall_with_block(MRBSTATE(mrb), self_val, mrb_intern(MRBSTATE(mrb), func_name.string()), argc, values, block_val);
 	delete[] values;
 	values = NULL;
 
@@ -736,19 +740,17 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1run
 /*
  * Class:     org_jamruby_mruby_MRuby
  * Method:    n_p
- * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ * Signature: (JLorg/jamruby/mruby/Value;)V;
  */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1p
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1p
   (JNIEnv *env, jclass clazz, jlong mrb, jobject value)
 {
 	mrb_value val = { { 0, } };
 	if (!create_mrb_value(env, value, val)) {
-		return NULL;
+		return;
 	}
-	mrb_value const &ret = mrb_p(MRBSTATE(mrb), val);
+	mrb_p(MRBSTATE(mrb), val);
 	fflush(0);
-	safe_jni::safe_local_ref<jobject> ref(env, create_value(env, ret));
-	return ref.get();
 }
 
 /*
@@ -1109,32 +1111,6 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1yieldArgv
 		return NULL;
 	}
 	mrb_value const &ret = mrb_yield_argv(MRBSTATE(mrb), blk_val, argc, values);
-	delete[] values;
-	values = NULL;
-	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
-	return result.get();
-}
-
-/*
- * Class:     org_jamruby_mruby_MRuby
- * Method:    n_yieldWithSelf
- * Signature: (JLorg/jamruby/mruby/Value;I[Lorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1yieldWithSelf
-  (JNIEnv *env, jclass, jlong mrb, jobject blk, jint argc, jobjectArray argv, jobject self)
-{
-	mrb_value blk_val, self_val;
-	if (!create_mrb_value(env, blk, blk_val)) {
-		return NULL;
-	}
-	if (!create_mrb_value(env, self, self_val)) {
-		return NULL;
-	}
-	mrb_value *values = create_mrb_value_array(env, argc, argv);
-	if (NULL == values) {
-		return NULL;
-	}
-	mrb_value const &ret = mrb_yield_with_self(MRBSTATE(mrb), blk_val, argc, values, self_val);
 	delete[] values;
 	values = NULL;
 	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));

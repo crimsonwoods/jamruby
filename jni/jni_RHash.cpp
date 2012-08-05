@@ -78,23 +78,3 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashGet
 	return result.get();
 }
 
-/*
- * Class:     org_jamruby_mruby_RHash
- * Method:    n_hashDeleteKey
- * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashDeleteKey
-  (JNIEnv *env, jclass, jlong mrb, jobject hash, jobject key)
-{
-	mrb_value hash_val, key_val;
-	if (!create_mrb_value(env, hash, hash_val)) {
-		return NULL;
-	}
-	if (!create_mrb_value(env, key, key_val)) {
-		return NULL;
-	}
-	mrb_value const &ret = mrb_hash_delete_key(to_ptr<mrb_state>(mrb), hash_val, key_val);
-	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
-	return result.get();
-}
-

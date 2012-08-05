@@ -39,14 +39,6 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_RHash_n_1hashSet
 JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashGet
   (JNIEnv *, jclass, jlong, jobject, jobject);
 
-/*
- * Class:     org_jamruby_mruby_RHash
- * Method:    n_hashDeleteKey
- * Signature: (JLorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_RHash_n_1hashDeleteKey
-  (JNIEnv *, jclass, jlong, jobject, jobject);
-
 #ifdef __cplusplus
 }
 #endif

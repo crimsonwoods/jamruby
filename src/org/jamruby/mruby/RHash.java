@@ -21,14 +21,9 @@ public class RHash extends RObject {
 		return n_hashGet(state.nativeObject(), hash, key);
 	}
 	
-	public static Value remove(State state, Value hash, Value key) {
-		return n_hashDeleteKey(state.nativeObject(), hash, key);
-	}
-	
 	private static native long n_getIv(long self);
 	private static native long n_getHt(long self);
 	
 	private static native void n_hashSet(long mrb, Value hash, Value key, Value value);
 	private static native Value n_hashGet(long mrb, Value hash, Value key);
-	private static native Value n_hashDeleteKey(long mrb, Value hash, Value key);
 }
