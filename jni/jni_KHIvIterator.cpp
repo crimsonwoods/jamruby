@@ -6,6 +6,7 @@ extern "C" {
 #include "mruby.h"
 #include "mruby/khash.h"
 #include "mruby/variable.h"
+KHASH_DECLARE(iv, mrb_sym, mrb_value, 1);
 }
 
 typedef uint32_t kh_iv_key;
