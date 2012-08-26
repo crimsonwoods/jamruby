@@ -186,10 +186,10 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1parseFile
  * Signature: (JJ)I
  */
 JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1generateCode
-  (JNIEnv *env, jclass clazz, jlong mrb, jlong node)
+  (JNIEnv *env, jclass clazz, jlong mrb, jlong parser_state)
 {
-	mrb_ast_node *ast_node = to_ptr<mrb_ast_node>(node);
-	return mrb_generate_code(MRBSTATE(mrb), ast_node);
+	mrb_parser_state *pstate = to_ptr<mrb_parser_state>(parser_state);
+	return mrb_generate_code(MRBSTATE(mrb), pstate);
 }
 
 /*

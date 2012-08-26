@@ -79,7 +79,7 @@ public class Jamruby {
 	
 	private int generateCode(ParserState p) {
 		validateParserState(p);
-		final int n = MRuby.generateCode(state, p.tree());
+		final int n = MRuby.generateCode(state, p);
 		final Pool pool = p.pool();
 		pool.close();
 		return n;

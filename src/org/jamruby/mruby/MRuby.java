@@ -26,8 +26,8 @@ public class MRuby {
 		return new ParserState(n_parseFile(state.nativeObject(), f.getAbsolutePath()));
 	}
 	
-	public static int generateCode(State state, AstNode node) {
-		return n_generateCode(state.nativeObject(), node.nativeObject());
+	public static int generateCode(State state, ParserState parserState) {
+		return n_generateCode(state.nativeObject(), parserState.nativeObject());
 	}
 	
 	public static Value arrayNew(State state) {
