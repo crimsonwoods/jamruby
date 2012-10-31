@@ -38,7 +38,7 @@ mrb_value jamruby_kernel_require(mrb_state *mrb, mrb_value self)
 	mrb_value name;
 	int const argc = mrb_get_args(mrb, "S", &name);
 	if (1 != argc) {
-		mrb_raise(mrb, E_ARGUMENT_ERROR, "wrong number of arguments (%d for 1)", argc);
+		mrb_raisef(mrb, E_ARGUMENT_ERROR, "wrong number of arguments (%d for 1)", argc);
 		return mrb_nil_value(); // don't reach here
 	}
 
@@ -70,7 +70,7 @@ mrb_value jamruby_kernel_require(mrb_state *mrb, mrb_value self)
 	if (!cls) {
 		env->ExceptionClear();
 		// TODO call original 'Kernel.require' method.
-		mrb_raise(mrb, E_NAME_ERROR, "class '%.*s' is not found in JVM.", len, str);
+		mrb_raisef(mrb, E_NAME_ERROR, "class '%.*s' is not found in JVM.", len, str);
 		return mrb_nil_value(); // don't reach here
 	}
 
