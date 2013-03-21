@@ -8,6 +8,7 @@ public class Value {
 	private double f;
 	private Symbol sym;
 	private RBasic obj;
+	private long ptr;
 	
 	public Value(int type, int value) {
 		this(ValueType.valueOf(type), value);
@@ -54,6 +55,12 @@ public class Value {
 			break;
 		case MRB_TT_DATA:
 			this.obj = new RData(obj);
+			break;
+		case MRB_TT_VOIDP:
+			this.ptr = obj;
+			break;
+		case MRB_TT_MAIN:
+			this.i = (int)obj;
 			break;
 		default:
 			throw new NotImplementedException(String.format("Unknown value type (%s).", type.toString()));
@@ -165,6 +172,12 @@ public class Value {
 		case MRB_TT_FLOAT:
 			builder.append(f);
 			break;
+		case MRB_TT_VOIDP:
+			builder.append(String.format("0x%016X", ptr));
+			break;
+		case MRB_TT_MAIN:
+			builder.append("main: " + i);
+			break;
 		case MRB_TT_STRING:
 			builder.append(((RString)obj).toString());
 			break;
@@ -223,13 +236,8 @@ public class Value {
 		case MRB_TT_EXCEPTION:
 		case MRB_TT_FILE:
 		case MRB_TT_FREE:
-		case MRB_TT_MATCH:
 		case MRB_TT_MAXDEFINE:
 		case MRB_TT_RANGE:
-		case MRB_TT_REGEX:
-		case MRB_TT_STRUCT:
-		case MRB_TT_THREAD:
-		case MRB_TT_THREADGRP:
 			builder.append("Ruby-Object");
 			break;
 		case MRB_TT_UNDEF:
