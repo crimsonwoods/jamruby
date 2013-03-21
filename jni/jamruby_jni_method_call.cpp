@@ -452,7 +452,7 @@ static mrb_value Object_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::
 static mrb_value String_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
 {
 	safe_jni::safe_string str(env, static_cast<jstring>(value));
-	return mrb_str_new2(mrb, str.string());
+	return mrb_str_new_cstr(mrb, str.string());
 }
 
 

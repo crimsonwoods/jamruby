@@ -95,7 +95,7 @@ static mrb_value jobject_to_s(mrb_state *mrb, mrb_value self)
 	safe_jni::safe_local_ref<jstring> s(env, static_cast<jstring>(env->CallObjectMethod(data->gref_jobj, jmid)));
 	safe_jni::safe_string str(env, s.get());
 
-	return mrb_str_new2(mrb, str.string());
+	return mrb_str_new_cstr(mrb, str.string());
 }
 
 static mrb_value jobject_initialize(mrb_state *mrb, mrb_value self)
