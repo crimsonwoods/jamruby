@@ -106,10 +106,11 @@ JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1loadIrep
 	try {
 		safe_jni::safe_string file_path(env, path);
 		FILE *fp = fopen(file_path.string(), "rb");
+		mrb_value ret;
 		if (NULL == fp) {
 			throw safe_jni::file_not_found_exception(strerror(errno));
 		}
-		n = mrb_load_irep(MRBSTATE(mrb), fp);
+		ret = mrb_load_irep_file(MRBSTATE(mrb), fp);
 		fclose(fp);
 	} catch (safe_jni::exception &e) {
 		throw_exception(env, e.java_exception_name(), e.message());
@@ -572,33 +573,6 @@ JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_MRuby_n_1sym2name
 	return jstr.get();
 }
 
-
-/*
- * Class:     org_jamruby_mruby_MRuby
- * Method:    n_strFormat
- * Signature: (JI[Lorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1strFormat
-  (JNIEnv *env, jclass, jlong mrb, jint argc, jobjectArray argv, jobject fmt)
-{
-	mrb_value fmt_val;
-	if (!create_mrb_value(env, fmt, fmt_val)) {
-		return NULL;
-	}
-
-	mrb_value *values = create_mrb_value_array(env, argc, argv);
-	if (NULL == values) {
-		return NULL;
-	}
-
-	mrb_value const &ret = mrb_str_format(MRBSTATE(mrb), argc, values, fmt_val);
-	delete[] values;
-	values = NULL;
-
-	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
-	return result.get();
-}
-
 /*
  * Class:     org_jamruby_mruby_MRuby
  * Method:    n_malloc
@@ -686,17 +660,6 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1open
   (JNIEnv *env, jclass clazz)
 {
 	return to_jlong(mrb_open());
-}
-
-/*
- * Class:     org_jamruby_mruby_MRuby
- * Method:    n_checkstack
- * Signature: (JI)I
- */
-JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1checkstack
-  (JNIEnv *env, jclass, jlong mrb, jint size)
-{
-	return mrb_checkstack(MRBSTATE(mrb), size);
 }
 
 /*
@@ -1025,17 +988,6 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1objClone
 	mrb_value const &ret = mrb_obj_clone(MRBSTATE(mrb), self_val);
 	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
 	return result.get();
-}
-
-/*
- * Class:     org_jamruby_mruby_MRuby
- * Method:    n_blockGivenP
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1blockGivenP
-  (JNIEnv *env, jclass)
-{
-	return mrb_block_given_p();
 }
 
 /*

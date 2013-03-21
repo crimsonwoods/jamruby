@@ -281,14 +281,6 @@ JNIEXPORT jstring JNICALL Java_org_jamruby_mruby_MRuby_n_1sym2name
 
 /*
  * Class:     org_jamruby_mruby_MRuby
- * Method:    n_strFormat
- * Signature: (JI[Lorg/jamruby/mruby/Value;Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
- */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1strFormat
-  (JNIEnv *, jclass, jlong, jint, jobjectArray, jobject);
-
-/*
- * Class:     org_jamruby_mruby_MRuby
  * Method:    n_malloc
  * Signature: (JJ)J
  */
@@ -342,14 +334,6 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1strNew
  */
 JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1open
   (JNIEnv *, jclass);
-
-/*
- * Class:     org_jamruby_mruby_MRuby
- * Method:    n_checkstack
- * Signature: (JI)I
- */
-JNIEXPORT jint JNICALL Java_org_jamruby_mruby_MRuby_n_1checkstack
-  (JNIEnv *, jclass, jlong, jint);
 
 /*
  * Class:     org_jamruby_mruby_MRuby
