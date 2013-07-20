@@ -14,7 +14,6 @@ public enum ValueType {
 	MRB_TT_UNDEF,
 	MRB_TT_FLOAT,
 	MRB_TT_VOIDP,
-	MRB_TT_MAIN,
 	MRB_TT_OBJECT,
 	MRB_TT_CLASS,
 	MRB_TT_MODULE,
@@ -29,6 +28,7 @@ public enum ValueType {
 	MRB_TT_FILE,
 	MRB_TT_ENV,
 	MRB_TT_DATA,
+	MRB_TT_FIBER,
 	MRB_TT_MAXDEFINE,
 	;
 	

@@ -22,17 +22,17 @@ template <typename JType> static jvalue call_method(mrb_state *mrb, JNIEnv *env,
 		{
 			safe_jni::safe_local_ref<jclass> jerror_class(env, env->FindClass("java/lang/Error"));
 			if (JNI_FALSE != env->IsInstanceOf(e.get(), jerror_class.get())) {
-				error_class = mrb_class_obj_get(mrb, "JError");
+				error_class = mrb_class_get(mrb, "JError");
 			}
 		}
 		if (NULL == error_class) {
 			safe_jni::safe_local_ref<jclass> jexception_class(env, env->FindClass("java/lang/Exception"));
 			if (JNI_FALSE != env->IsInstanceOf(e.get(), jexception_class.get())) {
-				error_class = mrb_class_obj_get(mrb, "JException");
+				error_class = mrb_class_get(mrb, "JException");
 			}
 		}
 		if (NULL == error_class) {
-			error_class = mrb_class_obj_get(mrb, "JThrowable");
+			error_class = mrb_class_get(mrb, "JThrowable");
 		}
 		env->ExceptionClear();
 		char *msg = NULL;

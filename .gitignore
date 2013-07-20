@@ -1,6 +1,7 @@
 # auto generated directories by Eclipse
 bin/
 gen/
+.settings/
 
 # generated directories by NDK build
 obj/

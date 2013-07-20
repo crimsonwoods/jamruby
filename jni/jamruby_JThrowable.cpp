@@ -3,7 +3,7 @@
 
 int jthrowable_init_class(mrb_state *mrb)
 {
-	RClass *exception_class = mrb_class_obj_get(mrb, "Exception");
+	RClass *exception_class = mrb_class_get(mrb, "Exception");
 	if (NULL == exception_class) {
 		LOGE("Class 'Exception' is not registered.");
 		return -1;

@@ -314,9 +314,9 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1objAlloc
 /*
  * Class:     org_jamruby_mruby_MRuby
  * Method:    n_free
- * Signature: (JJ)J
+ * Signature: (JJ)V;
  */
-JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1free
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1free
   (JNIEnv *, jclass, jlong, jlong);
 
 /*
@@ -506,10 +506,10 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1raise
 /*
  * Class:     org_jamruby_mruby_MRuby
  * Method:    n_warn
- * Signature: (Ljava/lang/String;)V
+ * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1warn
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jclass, jlong, jstring);
 
 /*
  * Class:     org_jamruby_mruby_MRuby

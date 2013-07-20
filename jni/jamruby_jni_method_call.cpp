@@ -187,12 +187,12 @@ mrb_value convert_jvalue_to_mrb_value(mrb_state *mrb, JNIEnv *env, jni_type_t co
 		case JNI_TYPE_LONG:
 			return mrb_fixnum_value((int32_t)ret.j); // TODO if 'Bignum' is supported by mruby, modify this code.
 		case JNI_TYPE_FLOAT:
-			return mrb_float_value(ret.f);
+			return mrb_float_value(mrb, ret.f);
 		case JNI_TYPE_DOUBLE:
 #ifdef MRB_USE_FLOAT
 			return mrb_float_value((float)ret.d);
 #else
-			return mrb_float_value(ret.d);
+			return mrb_float_value(mrb, ret.d);
 #endif
 		case JNI_TYPE_OBJECT:
 		{
@@ -431,16 +431,16 @@ static mrb_value Double_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::
 {
 	safe_jni::method<double> double_value(env, value, "doubleValue", "()D");
 #ifdef MRB_USE_FLOAT
-	return mrb_float_value((float)double_value(value));
+	return mrb_float_value(mrb, (float)double_value(value));
 #else
-	return mrb_float_value(double_value(value));
+	return mrb_float_value(mrb, double_value(value));
 #endif
 }
 
 static mrb_value Float_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)
 {
 	safe_jni::method<float> float_value(env, value, "floatValue", "()F");
-	return mrb_float_value(float_value(value));
+	return mrb_float_value(mrb, float_value(value));
 }
 
 static mrb_value Object_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)

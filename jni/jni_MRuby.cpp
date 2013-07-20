@@ -414,7 +414,7 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1classObjGet
   (JNIEnv *env, jclass, jlong mrb, jstring name)
 {
 	safe_jni::safe_string obj_name(env, name);
-	RClass *cls = mrb_class_obj_get(MRBSTATE(mrb), obj_name.string());
+	RClass *cls = mrb_class_get(MRBSTATE(mrb), obj_name.string());
 	return to_jlong(cls);
 }
 
@@ -630,11 +630,10 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1objAlloc
  * Method:    n_free
  * Signature: (JJ)J
  */
-JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1free
+JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1free
   (JNIEnv *env, jclass, jlong mrb, jlong p)
 {
-	void *ptr = mrb_free(MRBSTATE(mrb), to_ptr<void>(p));
-	return to_jlong(ptr);
+	mrb_free(MRBSTATE(mrb), to_ptr<void>(p));
 }
 
 /*
@@ -728,7 +727,7 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_MRuby_n_1toId
 	if (!create_mrb_value(env, name, name_val)) {
 		return 0;
 	}
-	mrb_sym mid = mrb_to_id(MRBSTATE(mrb), name_val);
+	mrb_sym mid = mrb_obj_to_sym(MRBSTATE(mrb), name_val);
 	return static_cast<jlong>(mid);
 }
 
@@ -851,7 +850,7 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1checkConvertType
 	}
 	safe_jni::safe_string type_name(env, tname);
 	safe_jni::safe_string method_name(env, method);
-	mrb_value const &ret = mrb_check_convert_type(MRBSTATE(mrb), val, type, type_name.string(), method_name.string());
+	mrb_value const &ret = mrb_check_convert_type(MRBSTATE(mrb), val, (mrb_vtype)type, type_name.string(), method_name.string());
 	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
 	return result.get();
 }
@@ -936,7 +935,7 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1convertType
 	}
 	safe_jni::safe_string type_name(env, tname);
 	safe_jni::safe_string method_name(env, method);
-	mrb_value const &ret = mrb_convert_type(MRBSTATE(mrb), val, type, type_name.string(), method_name.string());
+	mrb_value const &ret = mrb_convert_type(MRBSTATE(mrb), val, (mrb_vtype)type, type_name.string(), method_name.string());
 	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
 	return result.get();
 }
@@ -1005,25 +1004,25 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1raise
 /*
  * Class:     org_jamruby_mruby_MRuby
  * Method:    n_warn
- * Signature: (Ljava/lang/String;)V
+ * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1warn
-  (JNIEnv *env, jclass, jstring msg)
+  (JNIEnv *env, jclass, jlong mrb, jstring msg)
 {
 	safe_jni::safe_string message(env, msg);
-	mrb_warn(message.string());
+	mrb_warn(MRBSTATE(mrb), message.string());
 }
 
 /*
  * Class:     org_jamruby_mruby_MRuby
  * Method:    n_bug
- * Signature: (Ljava/lang/String;)V
+ * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1bug
-  (JNIEnv *env, jclass, jstring msg)
+  (JNIEnv *env, jclass, jlong mrb, jstring msg)
 {
 	safe_jni::safe_string message(env, msg);
-	mrb_bug(message.string());
+	mrb_bug(MRBSTATE(mrb), message.string());
 }
 
 /*
@@ -1206,7 +1205,7 @@ JNIEXPORT void JNICALL Java_org_jamruby_mruby_MRuby_n_1init_1JNI_1module
 		// TODO error handling
 	}
 
-	RClass *clsKern = mrb_class_obj_get(MRBSTATE(mrb), "Kernel");
+	RClass *clsKern = mrb_class_get(MRBSTATE(mrb), "Kernel");
 	if (NULL != clsKern)
 	{
 		RProc * const proc = replace_mrb_func(MRBSTATE(mrb), clsKern, "require", jamruby_kernel_require);

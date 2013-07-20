@@ -287,12 +287,12 @@ public class MRuby {
 		//n_raise(state.nativeObject(), c.nativeObject(), message);
 	}
 	
-	public static void warn(String format, Object... args) {
-		n_warn(String.format(format, args));
+	public static void warn(State state, String format, Object... args) {
+		n_warn(state.nativeObject(), String.format(format, args));
 	}
 	
-	public static void bug(String format, Object... args) {
-		n_bug(String.format(format, args));
+	public static void bug(State state, String format, Object... args) {
+		n_bug(state.nativeObject(), String.format(format, args));
 	}
 	
 	public static Value yield(State state, Value v, Value blk) {
@@ -426,8 +426,8 @@ public class MRuby {
 	
 	private static native int n_blockGivenP();
 	private static native void n_raise(long mrb, long c, String message);
-	private static native void n_warn(String message);
-	private static native void n_bug(String message);
+	private static native void n_warn(long mrb, String message);
+	private static native void n_bug(long mrb, String message);
 	
 	private static native Value n_yield(long mrb, Value v, Value blk);
 	private static native Value n_yieldArgv(long mrb, Value b, int argc, Value[] argv);

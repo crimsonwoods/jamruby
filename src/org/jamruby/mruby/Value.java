@@ -59,9 +59,6 @@ public class Value {
 		case MRB_TT_VOIDP:
 			this.ptr = obj;
 			break;
-		case MRB_TT_MAIN:
-			this.i = (int)obj;
-			break;
 		default:
 			throw new NotImplementedException(String.format("Unknown value type (%s).", type.toString()));
 		}
@@ -175,9 +172,6 @@ public class Value {
 		case MRB_TT_VOIDP:
 			builder.append(String.format("0x%016X", ptr));
 			break;
-		case MRB_TT_MAIN:
-			builder.append("main: " + i);
-			break;
 		case MRB_TT_STRING:
 			builder.append(((RString)obj).toString());
 			break;
@@ -221,6 +215,9 @@ public class Value {
 			if (null != t) {
 				builder.append(t.name());
 			}
+			break;
+		case MRB_TT_FIBER:
+			builder.append("Fiber");
 			break;
 		case MRB_TT_PROC:
 			final REnv e = ((RProc)obj).env();
