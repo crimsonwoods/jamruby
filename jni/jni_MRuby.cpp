@@ -1087,18 +1087,17 @@ JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1classNewInstance
 
 /*
  * Class:     org_jamruby_mruby_MRuby
- * Method:    n_classNewInstanceM
- * Signature: (JLorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
+ * Method:    n_objNew
+ * Signature: (JJI[Lorg/jamruby/mruby/Value;)Lorg/jamruby/mruby/Value;
  */
-JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1classNewInstanceM
-  (JNIEnv *env, jclass, jlong mrb, jobject klass)
+JNIEXPORT jobject JNICALL Java_org_jamruby_mruby_MRuby_n_1objNew
+  (JNIEnv *env, jclass, jlong mrb, jlong c, jint argc, jobjectArray argv)
 {
-	mrb_value klass_val;
-	if (!create_mrb_value(env, klass, klass_val)) {
-		return NULL;
-	}
-	mrb_value const &ret = mrb_class_new_instance_m(MRBSTATE(mrb), klass_val);
+	mrb_value *values = create_mrb_value_array(env, argc, argv);
+	mrb_value const &ret = mrb_obj_new(MRBSTATE(mrb), to_ptr<RClass>(c), argc, values);
 	safe_jni::safe_local_ref<jobject> result(env, create_value(env, ret));
+	delete[] values;
+	values = NULL;
 	return result.get();
 }
 

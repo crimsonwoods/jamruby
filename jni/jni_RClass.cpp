@@ -204,24 +204,3 @@ JNIEXPORT jlong JNICALL Java_org_jamruby_mruby_RClass_n_1classReal
 	return to_jlong(cls);
 }
 
-/*
- * Class:     org_jamruby_mruby_RClass
- * Method:    n_objCallInit
- * Signature: (JLorg/jamruby/mruby/Value;I[Lorg/jamruby/mruby/Value;)V
- */
-JNIEXPORT void JNICALL Java_org_jamruby_mruby_RClass_n_1objCallInit
-  (JNIEnv *env, jclass, jlong mrb, jobject obj, jint argc, jobjectArray argv)
-{
-	mrb_value obj_val;
-	if (!create_mrb_value(env, obj, obj_val)) {
-		return;
-	}
-	mrb_value *values = create_mrb_value_array(env, argc, argv);
-	if (NULL == values) {
-		return;
-	}
-	mrb_obj_call_init(to_ptr<mrb_state>(mrb), obj_val, argc, values);
-	delete[] values;
-	values = NULL;
-}
-

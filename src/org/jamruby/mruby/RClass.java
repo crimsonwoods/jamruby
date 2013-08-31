@@ -42,6 +42,4 @@ public class RClass extends RObject {
 	private static native boolean n_respondTo(long mrb, Value obj, long mid);
 	private static native boolean n_objIsInstanceOf(long mrb, Value obj, long c);
 	private static native long n_classReal(long c);
-	
-	private static native void n_objCallInit(long mrb, Value obj, int argc, Value... argv);
 }

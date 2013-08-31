@@ -307,8 +307,8 @@ public class MRuby {
 		return n_classNewInstance(state.nativeObject(), argc, argv, c.nativeObject());
 	}
 	
-	public static Value classNewInstanceM(State state, Value c) {
-		return n_classNewInstanceM(state.nativeObject(), c);
+	public static Value objNew(State state, RClass c, int argc, Value[] argv) {
+		return n_objNew(state.nativeObject(), c.nativeObject(), argc, argv);
 	}
 	
 	public static void defineAlias(State state, RClass c, String name1, String name2) {
@@ -432,7 +432,7 @@ public class MRuby {
 	private static native Value n_yield(long mrb, Value v, Value blk);
 	private static native Value n_yieldArgv(long mrb, Value b, int argc, Value[] argv);
 	private static native Value n_classNewInstance(long mrb, int argc, Value[] argv, long c);
-	private static native Value n_classNewInstanceM(long mrb, Value c);
+	private static native Value n_objNew(long mrb, long c, int argc, Value[] argv);
 	
 	private static native void n_defineAlias(long mrb, long c, String name1, String name2);
 	private static native String n_className(long mrb, long c);

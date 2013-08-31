@@ -1,9 +1,6 @@
 package org.jamruby.mruby;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import android.util.SparseArray;
 
 public enum ValueType {
 	MRB_TT_FALSE,
@@ -32,17 +29,17 @@ public enum ValueType {
 	MRB_TT_MAXDEFINE,
 	;
 	
-	private static final Map<Integer, ValueType> typeMap;
+	private static final SparseArray<ValueType> typeMap;
 	
 	static {
-		typeMap = Collections.synchronizedMap(new HashMap<Integer, ValueType>());
+		typeMap = new SparseArray<ValueType>();
 		ValueType[] types = ValueType.values();
 		for(int i = 0; i < types.length; ++i) {
 			typeMap.put(i, types[i]);
 		}
 	}
 	
-	public static ValueType valueOf(int value) {
+	public static synchronized ValueType valueOf(int value) {
 		final ValueType ret = typeMap.get(value);
 		if (null == ret) {
 			throw new IllegalArgumentException(String.format("Undefined value type (%d).", value));
@@ -50,13 +47,11 @@ public enum ValueType {
 		return ret;
 	}
 	
-	public static int toInteger(ValueType value) {
-		final Set<Map.Entry<Integer, ValueType>> entries = typeMap.entrySet();
-		for (Map.Entry<Integer, ValueType> e : entries) {
-			if (e.getValue().equals(value)) {
-				return e.getKey();
-			}
+	public static synchronized int toInteger(ValueType value) {
+		final int index = typeMap.indexOfValue(value);
+		if (0 > index) {
+			return -1;
 		}
-		return -1;
+		return typeMap.keyAt(index);
 	}
 }
