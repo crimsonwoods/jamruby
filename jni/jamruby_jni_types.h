@@ -28,6 +28,20 @@ private:
 	jni_type_id_t type_;
 	std::string   name_;
 
+	static char const *type_id_to_s(jni_type_id_t id) {
+		switch (id) {
+		case JNI_TYPE_VOID: return "void";
+		case JNI_TYPE_BOOLEAN: return "boolean";
+		case JNI_TYPE_BYTE: return "byte";
+		case JNI_TYPE_CHAR: return "char";
+		case JNI_TYPE_SHORT: return "short";
+		case JNI_TYPE_INT: return "int";
+		case JNI_TYPE_LONG: return "long";
+		case JNI_TYPE_FLOAT: return "float";
+		case JNI_TYPE_DOUBLE: return "double";
+		default: return "";
+		}
+	}
 public:
 	jni_type_t()
 		: type_(JNI_TYPE_UNKNOWN), name_()
@@ -38,7 +52,7 @@ public:
 	{
 	}
 	jni_type_t(jni_type_id_t id, bool is_array)
-		: type_(id | (is_array ? JNI_TYPE_ARRAY : 0)), name_()
+		: type_(id | (is_array ? JNI_TYPE_ARRAY : 0)), name_(type_id_to_s(id))
 	{
 	}
 	jni_type_t(bool is_array, char const * const name)
@@ -73,7 +87,9 @@ public:
 	}
 	jni_type_id_t type_id(jni_type_id_t id, bool is_array = false)
 	{
-		return type_ = (id | (is_array ? JNI_TYPE_ARRAY : 0));
+		type_ = (id | (is_array ? JNI_TYPE_ARRAY : 0));
+		name_ = type_id_to_s(id);
+		return type_;
 	}
 	void name(std::string const &name)
 	{

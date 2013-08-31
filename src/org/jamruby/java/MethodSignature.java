@@ -1,5 +1,6 @@
 package org.jamruby.java;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,11 +19,36 @@ public class MethodSignature {
 		put(double.class,  "D");
 	}};
 	
-	public static String genMethodSignature(Method m) {
+	public static synchronized String genMethodSignature(Method m) {
 		Class<?> retType = m.getReturnType();
 		final Class<?>[] paramTypes = m.getParameterTypes();
 		final StringBuilder builder = new StringBuilder();
 		builder.append("(");
+		builder.append(genParameters(paramTypes));
+		builder.append(")");
+		while(retType.isArray()) {
+			builder.append("[");
+			retType = retType.getComponentType();
+		}
+		if (TYPE_SIGNATURE_MAP.containsKey(retType)) {
+			builder.append(TYPE_SIGNATURE_MAP.get(retType));
+		} else {
+			builder.append(genSignature(retType.getCanonicalName()));
+		}
+		return builder.toString();
+	}
+	
+	public static synchronized String genCtorSignature(Constructor<?> c) {
+		final Class<?>[] paramTypes = c.getParameterTypes();
+		final StringBuilder builder = new StringBuilder();
+		builder.append("(");
+		builder.append(genParameters(paramTypes));
+		builder.append(")V");
+		return builder.toString();
+	}
+	
+	private static String genParameters(Class<?>[] paramTypes) {
+		final StringBuilder builder = new StringBuilder();
 		for (Class<?> pt : paramTypes) {
 			while (pt.isArray()) {
 				builder.append("[");
@@ -33,16 +59,6 @@ public class MethodSignature {
 			} else {
 				builder.append(genSignature(pt.getCanonicalName()));
 			}
-		}
-		builder.append(")");
-		while(retType.isArray()) {
-			builder.append("[");
-			retType = retType.getComponentType();
-		}
-		if (TYPE_SIGNATURE_MAP.containsKey(retType)) {
-			builder.append(TYPE_SIGNATURE_MAP.get(retType));
-		} else {
-			builder.append(genSignature(retType.getCanonicalName()));
 		}
 		return builder.toString();
 	}

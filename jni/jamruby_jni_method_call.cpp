@@ -25,6 +25,69 @@ static mrb_value Float_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::s
 static mrb_value Object_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
 static mrb_value String_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name);
 
+RClass *get_mruby_error_class(mrb_state *mrb, JNIEnv *env, jthrowable e)
+{
+	RClass *error_class = NULL;
+	{
+		safe_jni::safe_local_ref<jclass> jerror_class(env, env->FindClass("java/lang/Error"));
+		if (JNI_FALSE != env->IsInstanceOf(e, jerror_class.get())) {
+			error_class = mrb_class_get(mrb, "JError");
+		}   
+	}   
+	if (NULL == error_class) {
+		safe_jni::safe_local_ref<jclass> jexception_class(env, env->FindClass("java/lang/Exception"));
+		if (JNI_FALSE != env->IsInstanceOf(e, jexception_class.get())) {
+			error_class = mrb_class_get(mrb, "JException");
+		}   
+	}   
+	if (NULL == error_class) {
+		error_class = mrb_class_get(mrb, "JThrowable");
+	}   
+	return error_class;
+}
+
+char *get_message_from_jthrowable(JNIEnv *env, jthrowable e)
+{
+	safe_jni::safe_local_ref<jclass> cls(env, env->GetObjectClass(e));
+	if (cls.get()) {
+		jmethodID mid = env->GetMethodID(cls.get(), "getMessage", "()Ljava/lang/String;");
+		if (NULL != mid) {
+			safe_jni::safe_local_ref<jstring> str(env, static_cast<jstring>(env->CallObjectMethod(e, mid)));
+			safe_jni::safe_string msg_str(env, str.get());
+			return strdup(msg_str.string());
+		}
+	}
+	return NULL;
+}
+
+void raise_mruby_error(mrb_state *mrb, char *msg, RClass *error_class)
+{
+	if (NULL == msg) {
+		char const *err_msg = "Exception occurred inside of JVM.";
+		mrb_value const &exc = mrb_exc_new(mrb, error_class, err_msg, strlen(err_msg));
+		mrb_exc_raise(mrb, exc);
+	} else {
+		mrb_value const &exc = mrb_exc_new(mrb, error_class, msg, strlen(msg));
+		free(msg);
+		msg = NULL;
+		mrb_exc_raise(mrb, exc);
+	}
+}
+
+jobject call_ctor(mrb_state *mrb, JNIEnv *env, jclass jcls, jmethodID jmid, jvalue* args)
+{   
+	jobject new_obj = env->NewObjectA(jcls, jmid, args);
+	safe_jni::safe_local_ref<jthrowable> e(env, env->ExceptionOccurred());
+	if (NULL != e) {
+		env->ExceptionClear();
+		RClass *error_class = get_mruby_error_class(mrb, env, e.get());
+		env->ExceptionClear();
+		char *msg = get_message_from_jthrowable(env, e.get());
+		env->ExceptionClear(); 
+		raise_mruby_error(mrb, msg, error_class);
+	}
+	return new_obj;
+}
 
 void init_converters()
 {
@@ -296,15 +359,20 @@ bool get_argument_types(char const * const signature, jni_type_t *types, int num
 	for (int i = 0; i < num; ++i) {
 		jni_type_id_t tid = JNI_TYPE_UNKNOWN;
 		bool is_array = false;
+		char const *name = NULL;
+		size_t name_len = 0;
+		char *separator;
 		do {
 			switch(*p++) {
 			case 'L':
 				tid = JNI_TYPE_OBJECT;
-				p = strchr(p, ';');
-				if (NULL == p) {
+				separator = strchr(p, ';');
+				if (NULL == separator) {
 					return false;
 				}
-				++p;
+				name = p;
+				name_len = separator - p;
+				p = separator + 1;
 				break;
 			case 'V':
 				tid = JNI_TYPE_VOID;
@@ -342,6 +410,9 @@ bool get_argument_types(char const * const signature, jni_type_t *types, int num
 			}
 		} while(tid == JNI_TYPE_UNKNOWN);
 		types[i].type_id(tid, is_array);
+		if (tid == JNI_TYPE_OBJECT) {
+			types[i].name(std::string(name, name_len));
+		}
 	}
 
 	return true;
@@ -389,6 +460,69 @@ int get_count_of_arguments(char const * const signature)
 	}
 
 	return ret;
+}
+
+bool is_mrb_value_convertible_to(mrb_state *mrb, mrb_value value, jni_type_t const &type)
+{
+	if (mrb_nil_p(value)) {
+		if (type.is_array()) {
+			return true;
+		}
+		if (JNI_TYPE_OBJECT == type.type_id()) {
+			return true;
+		}
+		return false;
+	}
+
+	mrb_vtype const vtype = mrb_type(value);
+
+	switch (vtype) {
+	case MRB_TT_FALSE:
+	case MRB_TT_TRUE:
+		if (JNI_TYPE_BOOLEAN == type.type_id()) {
+			return true;
+		}
+		return false;
+	case MRB_TT_FIXNUM:
+		switch (type.type_id()) {
+		case JNI_TYPE_BYTE:
+		case JNI_TYPE_CHAR:
+		case JNI_TYPE_SHORT:
+		case JNI_TYPE_INT:
+		case JNI_TYPE_LONG:
+		case JNI_TYPE_FLOAT:
+		case JNI_TYPE_DOUBLE:
+			return true;
+		}
+		return false;
+	case MRB_TT_FLOAT:
+		switch (type.type_id()) {
+		case JNI_TYPE_FLOAT:
+			return true;
+		case JNI_TYPE_DOUBLE:
+			return true;
+		}
+		return false;
+	case MRB_TT_STRING:
+		if (JNI_TYPE_OBJECT != type.type_id()) {
+			return false;
+		}
+		if (type.name() == "java/lang/String") {
+			return true;
+		}
+		return false;
+	case MRB_TT_DATA:
+	case MRB_TT_OBJECT:
+		if (JNI_TYPE_OBJECT != type.type_id()) {
+			return false;
+		}
+		if (!jobject_is_jobject(mrb, value)) {
+			return true;
+		}
+		return false;
+	default:
+		return false;
+	}
 }
 
 static mrb_value Boolean_to_mrb(mrb_state *mrb, JNIEnv *env, jobject value, std::string const &type_name)

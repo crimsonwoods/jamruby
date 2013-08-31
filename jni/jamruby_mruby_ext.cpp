@@ -3,6 +3,8 @@
 #include "jamruby_Context.h"
 #include "jamruby_jni_method_call.h"
 #include "jamruby_jni_functor.h"
+#include "jamruby_MethodResolver.h"
+#include "jamruby_JObject.h"
 #include "jni_Log.h"
 #include "safe_jni.hpp"
 #include <cstring>
@@ -171,9 +173,28 @@ static void define_class(mrb_state *mrb, JNIEnv *env, RClass *parent, jclass cls
 		LOGE("cannot define the class '%s'.", name.c_str());
 		return;
 	}
+	MRB_SET_INSTANCE_TT(target, MRB_TT_DATA);
+
+	jobject obj = static_cast<jobject>(cls);
+
+	// get public constructors
+	safe_jni::method<jobjectArray> get_constructors(env, obj, "getConstructors", "()[Ljava/lang/reflect/Constructor;");
+	if (!get_constructors) {
+		env->ExceptionClear();
+		LOGE("cannot find 'getConstructors()' method in JVM.");
+		return;
+	}
+
+	safe_jni::safe_local_ref<jobjectArray> rctors(env, get_constructors(obj));
+	if (!rctors) {
+		env->ExceptionClear();
+		LOGE("cannot get public constructors.");
+		return;
+	}
+	safe_jni::safe_object_array ctors(env, rctors.get());
+	size_t const num_of_ctors = ctors.size();
 
 	// get public methods
-	jobject obj = static_cast<jobject>(cls);
 	safe_jni::method<jobjectArray> get_methods(env, obj, "getMethods", "()[Ljava/lang/reflect/Method;");
 	if (!get_methods) {
 		env->ExceptionClear();
@@ -215,6 +236,11 @@ static void define_class(mrb_state *mrb, JNIEnv *env, RClass *parent, jclass cls
 		LOGE("cannot find method 'genMethodSignature'.");
 		return;
 	}
+	safe_jni::method<jstring> gen_ctor_signature(env, method_signature_class.get(), "genCtorSignature", "(Ljava/lang/reflect/Constructor;)Ljava/lang/String;");
+	if (!gen_ctor_signature) {
+		LOGE("cannot find method 'genCtorSignature'.");
+		return;
+	}
 
 	jamruby_context *context = jamruby_context::find_context(mrb);
 	if (NULL == context) {
@@ -229,6 +255,14 @@ static void define_class(mrb_state *mrb, JNIEnv *env, RClass *parent, jclass cls
 	}
 
 	context->register_jclass(target, gref_cls);
+
+	for (size_t i = 0; i < num_of_ctors; ++i) {
+		safe_jni::safe_local_ref<jobject> c(env, ctors.get(i));
+		safe_jni::safe_local_ref<jstring> js_signature(env, gen_ctor_signature(method_signature_class.get(), c.get()));
+		safe_jni::safe_string signature(env, js_signature.get());
+		context->register_ctor_signature(target, signature.string());
+		LOGD("register constructor: <init>%s", signature.string());
+	}
 
 	for (size_t i = 0; i < num_of_methods; ++i) {
 		safe_jni::safe_local_ref<jobject> m(env, methods.get(i));
@@ -246,22 +280,20 @@ static void define_class(mrb_state *mrb, JNIEnv *env, RClass *parent, jclass cls
 		}
 		int const modifiers = get_modifiers(m.get());
 		if (is_static(modifier_class.get(), modifiers)) {
+			context->register_method_signature(true, target, mname_str.string(), signature.string());
 			if (is_class_method_defined(mrb, target, mname_str.string())) {
 				// already exported.
 				continue;
 			}
 
-			context->register_method_signature(true, target, mname_str.string(), signature.string());
-
 			LOGD("define class method '%s::%s : %s'.", name.c_str(), mname_str.string(), signature.string());
 			mrb_define_class_method(mrb, target, mname_str.string(), java_class_method, ARGS_ANY());
 		} else {
+			context->register_method_signature(false, target, mname_str.string(), signature.string());
 			if (is_method_defined(mrb, target, mname_str.string())) {
 				// already exported.
 				continue;
 			}
-
-			context->register_method_signature(false, target, mname_str.string(), signature.string());
 
 			LOGD("define instance method '%s.%s : %s'.", name.c_str(), mname_str.string(), signature.string());
 			mrb_define_method(mrb, target, mname_str.string(), java_object_method, ARGS_ANY());
@@ -271,63 +303,70 @@ static void define_class(mrb_state *mrb, JNIEnv *env, RClass *parent, jclass cls
 
 static mrb_value java_class_method(mrb_state *mrb, mrb_value self)
 {
+	if (mrb_type(self) != MRB_TT_CLASS) {
+		mrb_raise(mrb, E_ARGUMENT_ERROR, "argument type must be class type.");
+	}
+
 	try {
-		if (mrb_type(self) == MRB_TT_CLASS) {
-			RClass *cls = mrb_class_ptr(self);
-			jamruby_context *context = jamruby_context::find_context(mrb);
-			if (NULL == context) {
-				mrb_raise(mrb, E_RUNTIME_ERROR, "jamruby context is not found.");
-				return mrb_nil_value(); // don't reach here.
-			}
-
-			std::string const &sig = context->find_method_signature(true, cls, get_called_mrb_func_name(mrb));
-			if (sig.empty()) {
-				mrb_raise(mrb, E_RUNTIME_ERROR, "JVM method signature is not found.");
-				return mrb_nil_value(); // don't reach here.
-			}
-
-			jclass jcls = context->find_jclass(cls);
-			if (NULL == jcls) {
-				mrb_raise(mrb, E_RUNTIME_ERROR, "class object in JVM is not found.");
-				return mrb_nil_value(); // don't reach here.
-			}
-
-			JNIEnv *env = context->get_jni_env();
-			jmethodID jmid = env->GetStaticMethodID(jcls, get_called_mrb_func_name(mrb), sig.c_str());
-			if (NULL == jmid) {
-				LOGE("failed to get method %s::%s - %s", mrb_class_name(mrb, cls), get_called_mrb_func_name(mrb), sig.c_str());
-				env->ExceptionClear();
-				mrb_raise(mrb, E_RUNTIME_ERROR, "method in JVM is not found.");
-				return mrb_nil_value(); // don't reach here.
-			}
-
-			mrb_value *rb_argv = NULL;
-			int rb_argc = 0;
-			mrb_get_args(mrb, "*", &rb_argv, &rb_argc);
-
-			int const argc = get_count_of_arguments(sig.c_str());
-			if (rb_argc != argc) {
-				mrb_raise(mrb, E_ARGUMENT_ERROR, "number of argument is not match.");
-				return mrb_nil_value(); // don't reach here.
-			}
-
-			jni_type_t ret_type = get_return_type(sig.c_str());
-			std::vector<jvalue> jvals(argc);
-			std::vector<jni_type_t> types(argc);
-			if (!get_argument_types(sig.c_str(), &types[0], argc)) {
-				mrb_raise(mrb, E_RUNTIME_ERROR, "invalid signature format.");
-				return mrb_nil_value(); // don't reach here.
-			}
-
-			for (int i = 0; i < argc; ++i) {
-				convert_mrb_value_to_jvalue(mrb, context->get_jni_env(), rb_argv[i], jvals[i], types[i]);
-			}
-
-			jvalue const &ret = call_method(mrb, context->get_jni_env(), ret_type, jcls, jmid, &jvals[0]);
-			return convert_jvalue_to_mrb_value(mrb, context->get_jni_env(), ret_type, ret);
-		} else {
-			mrb_raise(mrb, E_ARGUMENT_ERROR, "argument type must be class type.");
+		RClass *cls = mrb_class_ptr(self);
+		jamruby_context *context = jamruby_context::find_context(mrb);
+		if (NULL == context) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "jamruby context is not found.");
+			return mrb_nil_value(); // don't reach here.
 		}
+
+		jamruby_context::signatures_t const &signatures = context->find_method_signatures(true, cls, get_called_mrb_func_name(mrb));
+		if (signatures.empty()) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "JVM method signature is not found.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		jclass jcls = context->find_jclass(cls);
+		if (NULL == jcls) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "class object in JVM is not found.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		mrb_value *rb_argv = NULL;
+		int rb_argc = 0;
+		mrb_get_args(mrb, "*", &rb_argv, &rb_argc);
+
+		method_resolver resolver;
+		std::string const &sig = resolver.resolve_ambiguous(mrb, signatures, rb_argc, rb_argv);
+		if (sig.empty()) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "JVM method signature is not found.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		JNIEnv *env = context->get_jni_env();
+		jmethodID jmid = env->GetStaticMethodID(jcls, get_called_mrb_func_name(mrb), sig.c_str());
+		if (NULL == jmid) {
+			LOGE("failed to get method %s::%s - %s", mrb_class_name(mrb, cls), get_called_mrb_func_name(mrb), sig.c_str());
+			env->ExceptionClear();
+			mrb_raise(mrb, E_RUNTIME_ERROR, "method in JVM is not found.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		int const argc = get_count_of_arguments(sig.c_str());
+		if (rb_argc != argc) {
+			mrb_raise(mrb, E_ARGUMENT_ERROR, "number of argument is not match.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		jni_type_t ret_type = get_return_type(sig.c_str());
+		std::vector<jvalue> jvals(argc);
+		std::vector<jni_type_t> types(argc);
+		if (!get_argument_types(sig.c_str(), &types[0], argc)) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "invalid signature format.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		for (int i = 0; i < argc; ++i) {
+			convert_mrb_value_to_jvalue(mrb, context->get_jni_env(), rb_argv[i], jvals[i], types[i]);
+		}
+
+		jvalue const &ret = call_method(mrb, context->get_jni_env(), ret_type, jcls, jmid, &jvals[0]);
+		return convert_jvalue_to_mrb_value(mrb, context->get_jni_env(), ret_type, ret);
 	} catch (std::exception& e) {
 		mrb_raise(mrb, E_RUNTIME_ERROR, e.what());
 	}
@@ -337,6 +376,69 @@ static mrb_value java_class_method(mrb_state *mrb, mrb_value self)
 static mrb_value java_object_method(mrb_state *mrb, mrb_value self)
 {
 	LOGD("%s:(%u,%s - %s::%s)", __func__, self.tt, mrb_obj_classname(mrb, self), mrb_class_name(mrb, get_called_mrb_class(mrb)), get_called_mrb_func_name(mrb));
+	try {
+		jobject jobj = jobject_get_jobject(mrb, self);
+
+		jamruby_context *context = jamruby_context::find_context(mrb);
+		if (NULL == context) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "jamruby context is not found.");
+		}
+
+		RClass *cls = mrb_obj_class(mrb, self);
+
+		jamruby_context::signatures_t const &signatures = context->find_method_signatures(false, cls, get_called_mrb_func_name(mrb));
+		if (signatures.empty()) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "JVM method signature is not found.");
+		}
+
+		jclass jcls = context->find_jclass(cls);
+		if (NULL == jcls) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "class object in JVM is not found.");
+		}
+
+		mrb_value *rb_argv = NULL;
+		int rb_argc = 0;
+		mrb_get_args(mrb, "*", &rb_argv, &rb_argc);
+
+		method_resolver resolver;
+		std::string const &sig = resolver.resolve_ambiguous(mrb, signatures, rb_argc, rb_argv);
+		if (sig.empty()) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "JVM method signature is not found.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		JNIEnv *env = context->get_jni_env();
+		jmethodID jmid = env->GetMethodID(jcls, get_called_mrb_func_name(mrb), sig.c_str());
+		if (NULL == jmid) {
+			LOGE("failed to get method %s::%s - %s", mrb_class_name(mrb, cls), get_called_mrb_func_name(mrb), sig.c_str());
+			env->ExceptionClear();
+			mrb_raise(mrb, E_RUNTIME_ERROR, "method in JVM is not found.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		int const argc = get_count_of_arguments(sig.c_str());
+		if (rb_argc != argc) {
+			mrb_raise(mrb, E_ARGUMENT_ERROR, "number of argument is not match.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		jni_type_t ret_type = get_return_type(sig.c_str());
+		std::vector<jvalue> jvals(argc);
+		std::vector<jni_type_t> types(argc);
+		if (!get_argument_types(sig.c_str(), &types[0], argc)) {
+			mrb_raise(mrb, E_RUNTIME_ERROR, "invalid signature format.");
+			return mrb_nil_value(); // don't reach here.
+		}
+
+		for (int i = 0; i < argc; ++i) {
+			convert_mrb_value_to_jvalue(mrb, context->get_jni_env(), rb_argv[i], jvals[i], types[i]);
+		}
+
+		jvalue const &ret = call_method(mrb, context->get_jni_env(), ret_type, jobj, jmid, &jvals[0]);
+		return convert_jvalue_to_mrb_value(mrb, context->get_jni_env(), ret_type, ret);
+	} catch (std::exception& e) {
+		mrb_raise(mrb, E_RUNTIME_ERROR, e.what());
+	}
 	return mrb_nil_value();
 }
 

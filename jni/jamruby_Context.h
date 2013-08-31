@@ -4,6 +4,7 @@
 #include <jni.h>
 #include "mruby.h"
 #include <map>
+#include <set>
 #include <string>
 
 namespace org {
@@ -20,9 +21,10 @@ private:
 
 	struct class_map_entry_t;
 public:
-	typedef std::map<mrb_state*, jamruby_context*>       map_type;
-	typedef std::map<mrb_sym, std::string>               signature_map_t;
-	typedef std::map<RClass*, class_map_entry_t*> class_map_t;
+	typedef std::set<std::string>                  signatures_t;
+	typedef std::map<mrb_state*, jamruby_context*> map_type;
+	typedef std::map<mrb_sym, signatures_t>        signature_map_t;
+	typedef std::map<RClass*, class_map_entry_t*>  class_map_t;
 
 	static jamruby_context *register_context(mrb_state *mrb, JNIEnv *env) {
 		map_type::const_iterator it = inner_map.find(mrb);
@@ -69,10 +71,14 @@ public:
 
 	bool register_method_signature(bool is_class_method, struct RClass *target,
 		char const * const name, char const * const sig);
-	void unregister_method_signature(bool is_class_method, struct RClass *target,
+	void unregister_method_signatures(bool is_class_method, struct RClass *target,
 		char const * const name);
-	std::string const &find_method_signature(bool is_class_method, struct RClass *target,
+	signatures_t find_method_signatures(bool is_class_method, struct RClass *target,
 		char const * const name);
+
+	bool register_ctor_signature(struct RClass *target, char const * const sig);
+	void unregister_ctor_signatures(struct RClass *target);
+	signatures_t find_ctor_signatures(struct RClass *target);
 
 	bool register_jclass(struct RClass *target, jclass jcls);
 	jclass unregister_jclass(struct RClass *target);
@@ -87,10 +93,11 @@ private:
 
 	struct class_map_entry_t {
 		jclass           jcls;
+		signatures_t    *ctors;
 		signature_map_t *class_methods;
 		signature_map_t *instance_methods;
 
-		class_map_entry_t() : jcls(NULL), class_methods(NULL), instance_methods(NULL) {}
+		class_map_entry_t() : jcls(NULL), ctors(NULL), class_methods(NULL), instance_methods(NULL) {}
 		~class_map_entry_t() {}
 	};
 
